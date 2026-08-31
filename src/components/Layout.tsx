@@ -1,38 +1,24 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import {
-  ArrowUpRight,
-  GitBranch,
-  Mail,
-  Menu,
-  X,
-} from 'lucide-react'
+import { ArrowUpRight, Mail, Menu, X } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
 
 const navigation = [
-  { to: '/', zh: '首頁', en: 'Home', end: true },
-  { to: '/research', zh: '研究', en: 'Research' },
-  { to: '/people', zh: '成員', en: 'People' },
-  { to: '/publications', zh: '論文', en: 'Publications' },
-  { to: '/highlights', zh: '亮點', en: 'Highlights' },
-  { to: '/archive', zh: '典藏', en: 'Archive' },
-  { to: '/join', zh: '加入我們', en: 'Join' },
+  { to: '/research', zh: '研究方向', en: 'Research' },
+  { to: '/people', zh: '研究團隊', en: 'People' },
+  { to: '/publications', zh: '論文資料庫', en: 'Publications' },
+  { to: '/highlights', zh: '研究成果', en: 'Highlights' },
+  { to: '/join', zh: '加入實驗室', en: 'Join us' },
   { to: '/contact', zh: '聯絡', en: 'Contact' },
 ]
 
-function CircuitMark() {
+function LabMark() {
   return (
-    <svg
-      aria-hidden="true"
-      className="brand-mark"
-      viewBox="0 0 44 44"
-      fill="none"
-    >
-      <rect x="1" y="1" width="42" height="42" rx="12" />
-      <path d="M11 14h8l4 4h10M11 30h8l4-4h10M14 11v22M30 11v22" />
-      <circle cx="14" cy="14" r="2" />
-      <circle cx="30" cy="30" r="2" />
-      <circle cx="23" cy="22" r="3" />
-    </svg>
+    <span className="lab-mark" aria-hidden="true">
+      <span />
+      <span />
+      <span />
+      <span />
+    </span>
   )
 }
 
@@ -52,16 +38,15 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="site-shell">
       <ScrollManager />
-      <a className="skip-link" href="#main-content">
-        跳到主要內容 Skip to content
-      </a>
+      <a className="skip-link" href="#main-content">跳到主要內容 Skip to content</a>
+
       <header className="site-header">
         <div className="header-inner">
           <NavLink className="brand" to="/" aria-label="NTHU VLSI/CAD Lab home" onClick={() => setMenuOpen(false)}>
-            <CircuitMark />
+            <LabMark />
             <span className="brand-copy">
-              <strong>VLSI/CAD LAB</strong>
-              <small>NATIONAL TSING HUA UNIVERSITY</small>
+              <strong>SC<span>LAB</span></strong>
+              <small>VLSI / CAD · NTHU</small>
             </span>
           </NavLink>
 
@@ -73,7 +58,7 @@ export function Layout({ children }: { children: ReactNode }) {
             aria-label={menuOpen ? '關閉選單 Close menu' : '開啟選單 Open menu'}
             onClick={() => setMenuOpen((open) => !open)}
           >
-            {menuOpen ? <X /> : <Menu />}
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
           <nav
@@ -85,7 +70,6 @@ export function Layout({ children }: { children: ReactNode }) {
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.end}
                 className={({ isActive }) => (isActive ? 'active' : undefined)}
                 onClick={() => setMenuOpen(false)}
               >
@@ -103,38 +87,36 @@ export function Layout({ children }: { children: ReactNode }) {
         <div className="footer-grid">
           <div>
             <div className="brand footer-brand">
-              <CircuitMark />
+              <LabMark />
               <span className="brand-copy">
-                <strong>VLSI/CAD LAB</strong>
-                <small>NTHU · HSINCHU, TAIWAN</small>
+                <strong>SC<span>LAB</span></strong>
+                <small>NATIONAL TSING HUA UNIVERSITY</small>
               </span>
             </div>
-            <p>
-              連結智慧系統與晶片設計
+            <p className="footer-motto">
+              把智慧系統，做成可靠的實體。
               <br />
-              <span lang="en">Bridging intelligent systems and silicon design.</span>
+              <span lang="en">Intelligence, built into reality.</span>
             </p>
           </div>
           <div>
             <p className="footer-label">CONTACT</p>
-            <a href="mailto:scchang@cs.nthu.edu.tw">
-              <Mail size={16} /> scchang@cs.nthu.edu.tw
-            </a>
+            <a href="mailto:scchang@cs.nthu.edu.tw"><Mail size={15} /> scchang@cs.nthu.edu.tw</a>
             <a href="https://www.cs.nthu.edu.tw/~scchang/" target="_blank" rel="noreferrer">
-              <ArrowUpRight size={16} /> Professor's official site
+              <ArrowUpRight size={15} /> 教授官方頁面
             </a>
           </div>
           <div>
-            <p className="footer-label">SOURCE</p>
-            <a href="https://github.com/nthu-sc-lab/sclab" target="_blank" rel="noreferrer">
-              <GitBranch size={16} /> GitHub repository
+            <p className="footer-label">EXPLORE</p>
+            <NavLink to="/archive"><ArrowUpRight size={15} /> 實驗室歷史典藏</NavLink>
+            <a href="https://sites.google.com/site/nthuvlsisclab/" target="_blank" rel="noreferrer">
+              <ArrowUpRight size={15} /> 舊網站 Archive
             </a>
-            <p className="archive-note">歷史資料均標示來源與年代。</p>
           </div>
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} NTHU VLSI/CAD Laboratory</span>
-          <span>Built as an open academic archive.</span>
+          <span>Hsinchu, Taiwan · Open academic archive</span>
         </div>
       </footer>
     </div>
