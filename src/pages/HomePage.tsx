@@ -3,32 +3,27 @@ import { Link } from 'react-router'
 import { announcements } from '../data/archive'
 import { researchAreas } from '../data/siteContent'
 import { papers } from '../lib/papers'
-import { Eyebrow, RouteLink, SectionHeading } from '../components/Shared'
+import { Eyebrow, RouteLink } from '../components/Shared'
 
-function SignalField() {
+function ResearchFocusPanel() {
   return (
-    <div className="signal-field" aria-hidden="true">
-      <div className="signal-field-top">
-        <span className="live-dot" />
-        <span>SCLAB / FIELD NOTE 01</span>
-        <span>HSC 24°48′N</span>
+    <div className="focus-panel" aria-label="Research focus">
+      <div className="focus-panel-head">
+        <span>RESEARCH FOCUS</span>
+        <span>NTHU / SC LAB</span>
       </div>
-      <div className="signal-grid-lines" />
-      <div className="signal-orbit orbit-outer" />
-      <div className="signal-orbit orbit-inner" />
-      <div className="signal-core">
-        <span>AI</span>
-        <strong>×</strong>
-        <span>VLSI</span>
+      <div className="focus-panel-list">
+        {researchAreas.map((area, index) => (
+          <div className="focus-row" key={area.id}>
+            <span>0{index + 1}</span>
+            <strong lang="en">{area.title.en}</strong>
+            <i aria-hidden="true" />
+          </div>
+        ))}
       </div>
-      <div className="signal-node signal-node-a"><span />MODEL</div>
-      <div className="signal-node signal-node-b"><span />SILICON</div>
-      <div className="signal-node signal-node-c"><span />SYSTEM</div>
-      <div className="signal-axis axis-x" />
-      <div className="signal-axis axis-y" />
-      <div className="signal-field-bottom">
-        <span>ROBUST / EFFICIENT / REAL</span>
-        <span>01 — 04</span>
+      <div className="focus-panel-foot">
+        <span>COMPUTER SCIENCE</span>
+        <span>Hsinchu, Taiwan</span>
       </div>
     </div>
   )
@@ -45,117 +40,80 @@ export function HomePage() {
       <section className="home-hero">
         <div className="home-hero-inner container">
           <div className="hero-copy">
-            <Eyebrow>NTHU · SHIH-CHIEH CHANG LAB</Eyebrow>
-            <h1>
-              讓智慧，
-              <em>落在晶片上。</em>
-            </h1>
+            <div className="hero-identity">
+              <span className="hero-identity-mark">SC</span>
+              <span>National Tsing Hua University<br />Department of Computer Science</span>
+            </div>
+            <Eyebrow>VLSI / CAD LABORATORY</Eyebrow>
+            <h1>VLSI/CAD<br /><em>Laboratory</em></h1>
+            <p className="hero-chinese">國立清華大學資訊工程學系<br />張世杰教授研究團隊</p>
             <p className="hero-lead">
-              從 AI 模型、低功耗架構到 VLSI 設計自動化，
-              我們把演算法帶進可靠、可運作的實體系統。
-            </p>
-            <p className="hero-lead-en" lang="en">
-              Building intelligent systems that survive contact with the real world.
+              研究涵蓋深度學習、低功耗 AI 架構、VLSI 設計自動化，以及半導體數位分身與機器人系統。
             </p>
             <div className="hero-actions">
-              <Link className="button-primary" to="/research">
-                探索研究方向 <ArrowRight size={17} />
-              </Link>
-              <Link className="button-ghost" to="/join">加入我們 <ArrowUpRight size={17} /></Link>
+              <Link className="button-primary" to="/research">Research <ArrowRight size={16} /></Link>
+              <Link className="button-secondary" to="/people">Members <ArrowUpRight size={16} /></Link>
             </div>
           </div>
-          <SignalField />
+          <ResearchFocusPanel />
         </div>
-        <div className="hero-foot container">
-          <span>NATIONAL TSING HUA UNIVERSITY</span>
-          <span>VLSI / CAD · AI SYSTEMS · ROBOTICS</span>
-          <span>Hsinchu, Taiwan</span>
+        <div className="hero-meta container">
+          <span>SC LAB / NTHU</span>
+          <span>VLSI · EDA · AI SYSTEMS</span>
+          <span>ESTABLISHED IN ACADEMIC RESEARCH</span>
         </div>
       </section>
 
       <section className="intro-section section-pad">
-        <div className="container intro-layout">
-          <div className="intro-label">
-            <span className="section-number">01</span>
-            <span>WHAT WE DO</span>
-          </div>
-          <div className="intro-statement">
-            <h2>研究，不只是在模型裡得到漂亮的答案。</h2>
-            <p>
-              真正有用的智慧，需要面對雜訊、功耗、延遲、熱效應與硬體限制。
-              SC Lab 從演算法一路走到晶片與系統，研究能在真實世界持續運作的計算。
-            </p>
-            <div className="intro-metrics">
-              <div><strong>{researchAreas.length}</strong><span>RESEARCH FRONTS</span></div>
-              <div><strong>{papers.length}</strong><span>RECENT THESES</span></div>
-              <div><strong>∞</strong><span>QUESTIONS TO ASK</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="research-preview section-pad">
         <div className="container">
-          <SectionHeading
-            eyebrow="02 / RESEARCH"
-            title="四個方向，一條從模型到實體的路。"
-            english="Four connected fronts, from model to physical system"
-            description="以教授官方研究方向為基礎，整理成更容易理解的研究入口。"
-          />
+          <div className="section-bar"><Eyebrow>RESEARCH AREAS</Eyebrow><span>01</span></div>
+          <div className="section-lead-grid">
+            <h2>研究範疇</h2>
+            <p>
+              我們關注計算方法與實體系統之間的連結，從演算法、模型與硬體架構，到設計自動化與系統驗證。
+            </p>
+          </div>
           <div className="research-grid">
             {researchAreas.map((area, index) => (
               <Link className={`research-card research-card-${index + 1}`} to={`/research#${area.id}`} key={area.id}>
                 <div className="research-card-head">
                   <span className="research-index">0{index + 1}</span>
-                  <ArrowUpRight size={19} />
+                  <ArrowUpRight size={18} />
                 </div>
-                <div>
-                  <h3>{area.title.zh}</h3>
-                  <p className="research-card-en" lang="en">{area.title.en}</p>
-                </div>
+                <h3>{area.title.zh}</h3>
                 <p className="research-card-summary">{area.summary.zh}</p>
               </Link>
             ))}
           </div>
-          <div className="section-link"><RouteLink to="/research">看完整研究方向</RouteLink></div>
+          <div className="section-link"><RouteLink to="/research">View research areas</RouteLink></div>
         </div>
       </section>
 
-      <section className="process-section section-pad">
-        <div className="container">
-          <div className="process-heading">
-            <div>
-              <Eyebrow>03 / OUR APPROACH</Eyebrow>
-              <h2>把問題拆開，<br /><em>再把它做回去。</em></h2>
-            </div>
-            <p>從一個想法開始，經過模型、架構與驗證，最後留下能被使用的系統。</p>
+      <section className="lab-profile section-pad">
+        <div className="container lab-profile-grid">
+          <div>
+            <div className="section-bar"><Eyebrow>PRINCIPAL INVESTIGATOR</Eyebrow><span>02</span></div>
+            <h2>張世杰教授</h2>
+            <p className="profile-role">Professor, Department of Computer Science<br />College of Semiconductor Research, NTHU</p>
+            <p className="profile-summary">
+              研究橫跨 VLSI/EDA、低功耗 AI、智慧感知、半導體數位分身與機器人系統，並持續與學術及產業夥伴合作。
+            </p>
+            <RouteLink to="/people">View profile</RouteLink>
           </div>
-          <div className="process-row">
-            <div className="process-step">
-              <span>01</span>
-              <div><strong>MODEL</strong><p>理解資料，建立對雜訊與變化有韌性的智慧。</p></div>
-            </div>
-            <div className="process-connector" aria-hidden="true">→</div>
-            <div className="process-step">
-              <span>02</span>
-              <div><strong>ARCHITECTURE</strong><p>讓模型在功耗、速度與記憶體限制中真正有效率。</p></div>
-            </div>
-            <div className="process-connector" aria-hidden="true">→</div>
-            <div className="process-step">
-              <span>03</span>
-              <div><strong>SYSTEM</strong><p>連結晶片、感知與機器，驗證它在現場如何運作。</p></div>
-            </div>
+          <div className="profile-facts">
+            <div><strong>{researchAreas.length}</strong><span>RESEARCH AREAS</span></div>
+            <div><strong>{papers.length}</strong><span>THESIS RECORDS</span></div>
+            <div><strong>NTHU</strong><span>COMPUTER SCIENCE</span></div>
           </div>
         </div>
       </section>
 
       <section className="work-section section-pad">
-        <div className="container work-layout">
-          <div className="work-intro">
-            <Eyebrow>04 / RECENT WORK</Eyebrow>
-            <h2>把研究留下來，讓下一個問題有入口。</h2>
-            <p>瀏覽近期論文，或沿著歷史典藏看見研究室一路累積的軌跡。</p>
-            <RouteLink to="/publications">進入論文資料庫</RouteLink>
+        <div className="container">
+          <div className="section-bar"><Eyebrow>SELECTED PUBLICATIONS</Eyebrow><span>03</span></div>
+          <div className="section-lead-grid">
+            <h2>論文與研究成果</h2>
+            <p>近期論文依研究主題整理，完整資料與 Handle 連結收錄於 Publications。</p>
           </div>
           <div className="paper-preview-list">
             {papers.slice(0, 3).map((paper) => (
@@ -166,14 +124,16 @@ export function HomePage() {
               </a>
             ))}
           </div>
+          <div className="section-link"><RouteLink to="/publications">Browse all publications</RouteLink></div>
         </div>
       </section>
 
       <section className="archive-strip">
         <div className="container archive-strip-inner">
           <div>
-            <Eyebrow>FROM THE ARCHIVE</Eyebrow>
-            <h2>研究會變，累積不會。</h2>
+            <div className="section-bar section-bar-dark"><Eyebrow>HIGHLIGHTS & ARCHIVE</Eyebrow><span>04</span></div>
+            <h2>研究紀錄</h2>
+            <p>保存歷年研究成果、競賽與實驗室活動，並標示資料來源與年代。</p>
           </div>
           <div className="archive-signal-list">
             {archiveSignals.map((item) => (
@@ -181,23 +141,15 @@ export function HomePage() {
                 <time>{item.date.slice(0, 4)}</time><span>{item.title}</span>
               </div>
             ))}
-            <RouteLink to="/archive">瀏覽歷史典藏</RouteLink>
+            <RouteLink to="/archive">Open archive</RouteLink>
           </div>
         </div>
       </section>
 
       <section className="join-cta section-pad">
-        <div className="container">
-          <div className="cta-band">
-            <div>
-              <Eyebrow>JOIN THE LAB</Eyebrow>
-              <h2>有問題想做成系統？<br /><em>來一起試。</em></h2>
-            </div>
-            <div className="cta-copy">
-              <p>歡迎對 AI 晶片、VLSI/EDA、智慧感知與軟硬體協同設計有熱情的學生加入我們。</p>
-              <Link className="button-primary" to="/join">了解加入方式 <ArrowRight size={17} /></Link>
-            </div>
-          </div>
+        <div className="container join-cta-inner">
+          <div><Eyebrow>JOIN THE LAB</Eyebrow><h2>對 VLSI、EDA 或 AI 系統研究有興趣？</h2></div>
+          <Link className="button-primary" to="/join">Information for applicants <ArrowRight size={16} /></Link>
         </div>
       </section>
     </>

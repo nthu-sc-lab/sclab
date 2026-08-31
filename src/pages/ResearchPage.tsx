@@ -22,7 +22,7 @@ export function ResearchPage() {
           />
           <div className="research-detail-grid">
             {researchAreas.map((area, index) => (
-              <article className="research-detail" key={area.id}>
+              <article className="research-detail" id={area.id} key={area.id}>
                 <span className="research-index">CLUSTER 0{index + 1}</span>
                 <h3>{area.title.zh}</h3>
                 <p className="heading-english" lang="en">{area.title.en}</p>

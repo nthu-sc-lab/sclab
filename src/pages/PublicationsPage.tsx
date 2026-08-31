@@ -41,35 +41,38 @@ export function PublicationsPage() {
   return (
     <>
       <PageHero
-        eyebrow="PUBLICATIONS · 2022–2025"
-        title="用題目看見研究的連結"
-        english="Explore recent theses by topic"
-        description="目前收錄 papers.txt 中 20 篇碩士論文。文字雲權重依含該標籤的論文篇數計算，不使用點閱或下載數。"
+        eyebrow="PUBLICATIONS"
+        title="研究成果"
+        english="Selected theses and publications"
+        description="收錄 2022 至 2025 年間的碩士論文，依研究主題與出版年份整理，並保留原始 Handle 連結。"
       />
 
       <section className="section-pad">
         <div className="container">
           <div className="publication-summary">
-            <div className="stat-card"><strong>{papers.length}</strong><span>收錄論文 Collected theses</span></div>
-            <div className="stat-card"><strong>{paperPublicationYears.length}</strong><span>出版年度 Publication years</span></div>
-            <div className="stat-card"><strong>{PAPER_CATEGORIES.length}</strong><span>主要領域 Primary fields</span></div>
-            <div className="stat-card"><strong>{new Set(papers.flatMap((paper) => paper.tags)).size}</strong><span>正規化標籤 Curated tags</span></div>
+            <div className="stat-card"><strong>{papers.length}</strong><span>收錄論文</span></div>
+            <div className="stat-card"><strong>{paperPublicationYears.length}</strong><span>出版年份</span></div>
+            <div className="stat-card"><strong>{PAPER_CATEGORIES.length}</strong><span>研究領域</span></div>
+            <div className="stat-card"><strong>{new Set(papers.flatMap((paper) => paper.tags)).size}</strong><span>主題標籤</span></div>
           </div>
 
-          <div className="cloud-panel">
-            <SectionHeading
-              eyebrow="INTERACTIVE WORD CLOUD"
-              title="研究文字雲"
-              english="Click a term to filter the thesis list"
-              description="先選領域切換文字雲，再點擊關鍵詞；所有篩選條件會同步套用到下方論文清單。"
-            />
+          <div className="keyword-index">
+            <div className="keyword-index-header">
+              <SectionHeading
+                eyebrow="RESEARCH INDEX"
+                title="研究主題索引"
+                english="A structured view of the collection"
+                description="選擇研究領域或主題標籤，快速縮小論文範圍。標籤依出現於論文中的次數排列。"
+              />
+              <span className="keyword-index-count">{cloudTerms.length} TERMS</span>
+            </div>
             <div className="topic-tabs" aria-label="Research categories">
               <button
                 className={!categoryId ? 'topic-tab active' : 'topic-tab'}
                 type="button"
                 onClick={() => { setCategoryId(null); setTag(null) }}
               >
-                全部 All
+                全部領域
               </button>
               {PAPER_CATEGORIES.map((category) => (
                 <button
@@ -83,7 +86,7 @@ export function PublicationsPage() {
               ))}
             </div>
 
-            <div className="word-cloud" aria-label="Clickable research term cloud">
+            <div className="word-cloud" aria-label="Clickable research topic index">
               {cloudTerms.map((term, index) => (
                 <button
                   key={term.text}
@@ -94,7 +97,7 @@ export function PublicationsPage() {
                   aria-label={`${term.text}，${term.documentFrequency} 篇論文`}
                   onClick={() => setTag((current) => current === term.text ? null : term.text)}
                 >
-                  {term.text}
+                  <span>{term.text}</span><small>{term.documentFrequency}</small>
                 </button>
               ))}
             </div>
@@ -102,20 +105,19 @@ export function PublicationsPage() {
 
           <div className="publication-controls">
             <div className="control-field">
-              <label htmlFor="paper-search">搜尋 Search</label>
-              <div style={{ position: 'relative' }}>
-                <Search size={17} style={{ position: 'absolute', top: 16, left: 14, color: '#698087' }} />
+              <label htmlFor="paper-search">Search</label>
+              <div className="search-input-wrap">
+                <Search size={16} aria-hidden="true" />
                 <input
                   id="paper-search"
                   value={query}
-                  style={{ paddingLeft: 42 }}
-                  placeholder="題目、姓名或關鍵詞"
+                  placeholder="論文題目、姓名或主題"
                   onChange={(event) => setQuery(event.target.value)}
                 />
               </div>
             </div>
             <div className="control-field">
-              <label htmlFor="paper-category">領域 Field</label>
+              <label htmlFor="paper-category">Research area</label>
               <select
                 id="paper-category"
                 value={categoryId ?? ''}
@@ -129,22 +131,22 @@ export function PublicationsPage() {
               </select>
             </div>
             <div className="control-field">
-              <label htmlFor="paper-year">年份 Year</label>
+              <label htmlFor="paper-year">Year</label>
               <select id="paper-year" value={year ?? ''} onChange={(event) => setYear(event.target.value ? Number(event.target.value) : null)}>
                 <option value="">全部年份</option>
                 {paperPublicationYears.map((publicationYear) => <option key={publicationYear} value={publicationYear}>{publicationYear}</option>)}
               </select>
             </div>
-            <button className="clear-button" type="button" disabled={!hasFilters} onClick={clearFilters}>清除 Clear</button>
+            <button className="clear-button" type="button" disabled={!hasFilters} onClick={clearFilters}>Clear</button>
           </div>
 
           <div className="result-bar" aria-live="polite">
             <span>顯示 {visiblePapers.length} / {papers.length} 篇論文</span>
-            {tag && <span className="selected-filter">TAG / {tag}</span>}
+            {tag && <span className="selected-filter">FILTER / {tag}</span>}
           </div>
 
           {visiblePapers.length === 0 ? (
-            <div className="empty-state">沒有符合條件的論文。請調整篩選或清除條件。</div>
+            <div className="empty-state">沒有符合條件的論文，請調整篩選條件。</div>
           ) : (
             <div className="paper-list">
               {visiblePapers.map((paper) => (
@@ -152,7 +154,7 @@ export function PublicationsPage() {
                   <span className="paper-number">#{String(paper.id).padStart(2, '0')}</span>
                   <div>
                     <span className="topic-pill">{PAPER_CATEGORY_BY_ID[paper.categoryId].label}</span>
-                    <h3 style={{ marginTop: 14 }}>{paper.title}</h3>
+                    <h3>{paper.title}</h3>
                     <div className="paper-meta">
                       <span>{paper.student}</span>
                       <span>{paper.publicationYear}</span>
@@ -164,7 +166,7 @@ export function PublicationsPage() {
                     </div>
                   </div>
                   <a className="paper-action" href={paper.url} target="_blank" rel="noreferrer" aria-label={`開啟 ${paper.title} 的正式論文頁`}>
-                    <ArrowUpRight size={19} />
+                    <ArrowUpRight size={18} />
                   </a>
                 </article>
               ))}

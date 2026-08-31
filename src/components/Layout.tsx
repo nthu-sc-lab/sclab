@@ -3,12 +3,12 @@ import { ArrowUpRight, Mail, Menu, X } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
 
 const navigation = [
-  { to: '/research', zh: '研究方向', en: 'Research' },
-  { to: '/people', zh: '研究團隊', en: 'People' },
-  { to: '/publications', zh: '論文資料庫', en: 'Publications' },
-  { to: '/highlights', zh: '研究成果', en: 'Highlights' },
-  { to: '/join', zh: '加入實驗室', en: 'Join us' },
-  { to: '/contact', zh: '聯絡', en: 'Contact' },
+  { to: '/research', label: 'Research' },
+  { to: '/people', label: 'Members' },
+  { to: '/publications', label: 'Publications' },
+  { to: '/highlights', label: 'Highlights' },
+  { to: '/join', label: 'Join us' },
+  { to: '/contact', label: 'Contact' },
 ]
 
 function LabMark() {
@@ -73,8 +73,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 className={({ isActive }) => (isActive ? 'active' : undefined)}
                 onClick={() => setMenuOpen(false)}
               >
-                <span>{item.zh}</span>
-                <small>{item.en}</small>
+                <span>{item.label}</span>
               </NavLink>
             ))}
           </nav>
