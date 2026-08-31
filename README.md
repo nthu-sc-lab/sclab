@@ -2,6 +2,8 @@
 
 National Tsing Hua University SCLAB website, built with React and Vite.
 
+Research publications are loaded from [`papers.csv`](./papers.csv), the 124-record NTHU library export. The site derives the four research areas and clickable topic cloud from its title and subject metadata. The campus image gallery is available at `#/gallery` and is kept off the home page.
+
 ## Local development
 
 On Windows PowerShell, use `npm.cmd` if the execution policy blocks `npm.ps1`:

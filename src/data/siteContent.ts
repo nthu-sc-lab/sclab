@@ -1,3 +1,6 @@
+import { PAPER_CATEGORIES, type PaperCategoryId } from './paperTaxonomy'
+import { buildWordCloudTerms, paperCategoryCounts, papers } from '../lib/papers'
+
 export interface LocalizedText {
   readonly zh: string
   readonly en: string
@@ -9,7 +12,7 @@ export interface SourceReference {
 }
 
 export interface ResearchArea {
-  readonly id: string
+  readonly id: PaperCategoryId
   readonly title: LocalizedText
   readonly summary: LocalizedText
   readonly topics: readonly LocalizedText[]
@@ -17,19 +20,35 @@ export interface ResearchArea {
 
 export const sources = {
   professor: {
-    label: '張世杰教授官方首頁',
+    label: 'Professor profile',
     url: 'https://www.cs.nthu.edu.tw/~scchang/',
   },
-  scholars: {
-    label: '國立清華大學學者系統',
-    url: 'https://scholars.nthu.edu.tw/esploro/profile/shihchieh_chang',
+  researchActivity: {
+    label: 'Academic honors page',
+    url: 'https://www.cs.nthu.edu.tw/~scchang/research_activity.html',
+  },
+  nthuNews: {
+    label: 'NTHU bulletin',
+    url: 'https://www.nthu.edu.tw/periodical/index/102',
+  },
+  nthu2016ResearchAward: {
+    label: 'NTHU research award news',
+    url: 'https://www.nthu.edu.tw/hotNews/content/34',
+  },
+  nthuEecs: {
+    label: 'NTHU EECS bulletin',
+    url: 'https://eecs.site.nthu.edu.tw/p/405-1005-291496,c148.php?Lang=zh-tw',
+  },
+  mostAwardProfile: {
+    label: 'MOST award profile',
+    url: 'https://02232568002016b.xlog.com.tw/images/files/11125.pdf',
   },
   itri: {
     label: '工業技術研究院經營團隊',
     url: 'https://www.itri.org.tw/ListStyle.aspx?DisplayStyle=01_content&MGID=1162141307626510443&MmmID=1036233406517556313&SiteID=1',
   },
   oldLab: {
-    label: 'VLSI/CAD Lab 舊站',
+    label: 'Laboratory archive',
     url: 'https://sites.google.com/site/nthuvlsisclab/',
   },
   nthuLabs: {
@@ -42,60 +61,40 @@ export const sources = {
   },
 } satisfies Record<string, SourceReference>
 
-export const researchAreas: readonly ResearchArea[] = [
-  {
-    id: 'deep-learning',
-    title: { zh: '深度學習與智慧感知', en: 'Deep Learning & Intelligent Perception' },
-    summary: {
-      zh: '從強健神經網路、語音辨識到自然語言模型，探索能在真實雜訊與變異下工作的智慧系統。',
-      en: 'Robust neural systems for speech, language, and perception under real-world noise and variation.',
-    },
-    topics: [
-      { zh: '抗雜訊與變異神經網路', en: 'Noise- and variation-robust neural networks' },
-      { zh: '語音辨識與音訊 AI', en: 'Speech recognition and audio AI' },
-      { zh: '自然語言建模', en: 'Natural language modeling' },
-    ],
+const RESEARCH_AREA_SUMMARIES: Readonly<Record<PaperCategoryId, LocalizedText>> = {
+  'ai-acceleration': {
+    zh: '從模型壓縮、量化到推論架構，探索 AI 演算法與硬體加速的共同設計。',
+    en: 'Co-designing AI algorithms and hardware through model compression, quantization, and efficient inference.',
   },
-  {
-    id: 'ai-architecture',
-    title: { zh: 'AI 模型與低功耗架構', en: 'AI Models & Low-Power Architecture' },
-    summary: {
-      zh: '共同設計模型、演算法與硬體，降低推論成本並提升部署效率、可靠度與可解釋性。',
-      en: 'Co-designing models, algorithms, and hardware for efficient and dependable AI deployment.',
-    },
-    topics: [
-      { zh: '低功耗 AI 估算與架構', en: 'Low-power AI estimation and architecture' },
-      { zh: '模型壓縮與硬體感知搜尋', en: 'Compression and hardware-aware architecture search' },
-      { zh: 'AI 失效分析與推薦系統', en: 'AI failure analysis and recommendation systems' },
-    ],
+  'eda-power-integrity': {
+    zh: '以設計自動化、時序分析與電源完整性方法，提升晶片系統的效能與可靠度。',
+    en: 'Improving chip performance and reliability through design automation, timing analysis, and power integrity.',
   },
-  {
-    id: 'vlsi-eda',
-    title: { zh: 'VLSI 設計與設計自動化', en: 'VLSI Design & Design Automation' },
-    summary: {
-      zh: '針對老化、雜訊、熱效應、功耗與時序變異，發展可落地於晶片設計流程的分析與最佳化方法。',
-      en: 'Analysis and optimization for aging, noise, thermal effects, power, and timing variation.',
-    },
-    topics: [
-      { zh: '電源完整性與功耗閘控', en: 'Power integrity and power gating' },
-      { zh: '時序變異容忍設計', en: 'Delay-variation tolerant design' },
-      { zh: '可靠度、老化與熱分析', en: 'Reliability, aging, and thermal analysis' },
-    ],
+  'computer-vision': {
+    zh: '以事件相機、深度估計、3D 建模與影像辨識研究高效率的視覺理解系統。',
+    en: 'Efficient visual understanding with event cameras, depth estimation, 3D modeling, and image recognition.',
   },
-  {
-    id: 'digital-twin',
-    title: { zh: '半導體數位分身與機器人', en: 'Semiconductor Digital Twins & Robotics' },
-    summary: {
-      zh: '連結模擬與實體系統，研究半導體數位分身、機器手臂 sim-to-real 與硬體迴路驗證。',
-      en: 'Connecting simulation and physical systems through semiconductor digital twins and robotics.',
-    },
-    topics: [
-      { zh: '半導體數位分身', en: 'Digital twins for semiconductors' },
-      { zh: '機器手臂 sim-to-real', en: 'Robot-arm sim-to-real and real-to-sim' },
-      { zh: '硬體迴路設計', en: 'Hardware-in-the-loop design' },
-    ],
+  'speech-audio': {
+    zh: '研究關鍵字偵測、語音活動分析與語音增強，發展可部署的低功耗音訊 AI。',
+    en: 'Deployable, low-power audio AI for keyword spotting, voice activity analysis, and speech enhancement.',
   },
-]
+}
+
+function getResearchTopics(categoryId: PaperCategoryId): readonly LocalizedText[] {
+  return buildWordCloudTerms(papers, { categoryId })
+    .slice(0, 5)
+    .map((term) => ({ zh: term.text, en: term.text }))
+}
+
+export const researchAreas: readonly ResearchArea[] = PAPER_CATEGORIES.map((category) => ({
+  id: category.id,
+  title: { zh: category.label, en: category.englishLabel },
+  summary: {
+    zh: `${RESEARCH_AREA_SUMMARIES[category.id].zh}（CSV 收錄 ${paperCategoryCounts[category.id]} 筆研究紀錄）`,
+    en: `${RESEARCH_AREA_SUMMARIES[category.id].en} ${paperCategoryCounts[category.id]} catalogue records are indexed here.`,
+  },
+  topics: getResearchTopics(category.id),
+}))
 
 export const professor = {
   name: { zh: '張世杰 教授', en: 'Prof. Shih-Chieh Chang' },
@@ -117,6 +116,29 @@ export const professor = {
   source: sources.professor,
 } as const
 
+export const professorPhoto = {
+  local: `${import.meta.env.BASE_URL}professor.jpg`,
+  member: `${import.meta.env.BASE_URL}professor-2.jpg`,
+  fallback: 'https://cosr.site.nthu.edu.tw/var/file/536/1536/img/858960265.png',
+} as const
+
+export const campusPhotos = [
+  {
+    src: `${import.meta.env.BASE_URL}nthu-campus.jpg`,
+    alt: '國立清華大學校園與大草坪',
+    label: 'NTHU CAMPUS',
+    title: '國立清華大學校園',
+    source: 'https://www.nthu.edu.tw/hotNews/content/513',
+  },
+  {
+    src: `${import.meta.env.BASE_URL}nthu-entrance.jpg`,
+    alt: '國立清華大學校園入口',
+    label: 'CAMPUS ENTRANCE',
+    title: '清華校園入口',
+    source: 'https://www.nthu.edu.tw/hotNews/content/1024',
+  },
+] as const
+
 export const professorMilestones = [
   {
     period: '2022–Present',
@@ -134,13 +156,13 @@ export const professorMilestones = [
     period: '2018–2022',
     title: '清華大學人工智慧研發中心主任',
     english: 'Director, Artificial Intelligence Research Center, NTHU',
-    source: sources.scholars,
+    source: sources.professor,
   },
   {
     period: '2012–2015',
     title: '清華大學資訊工程學系系主任',
     english: 'Chair, Department of Computer Science, NTHU',
-    source: sources.scholars,
+    source: sources.professor,
   },
   {
     period: '1996–2001',
@@ -160,10 +182,10 @@ export const industryNetwork = [
   {
     title: { zh: '清大學術研究', en: 'NTHU Academic Research' },
     description: {
-      zh: '清大學者系統收錄研究成果、榮譽、教學與服務紀錄，並確認教授於資工系與半導體研究學院的研究單位。',
-      en: 'The NTHU Scholars profile connects publications, honors, teaching, and institutional affiliations.',
+      zh: '教授個人研究資料記錄研究成果、研究興趣與學術任職資訊。',
+      en: 'The professor profile records research interests, publications, and academic appointments.',
     },
-    source: sources.scholars,
+    source: sources.professor,
   },
   {
     title: { zh: '工研院產業研發', en: 'ITRI Industrial R&D' },
@@ -188,36 +210,5 @@ export const industryNetwork = [
       en: 'NTHU Computer Science lists VLSI/CAD as a broader faculty research community in chip design and CAD.',
     },
     source: sources.nthuLabs,
-  },
-] as const
-
-export const recruiting = {
-  title: { zh: '一起解真實世界的問題', en: 'Work on problems that matter' },
-  introduction: {
-    zh: '研究團隊長期連結教授、研究生與產業工程師，從真實產業問題出發，完成系統實作並投稿高品質國際會議與期刊。歡迎對 AI 晶片、VLSI/EDA、軟硬體協同設計與智慧系統有熱情的學生加入。',
-    en: 'Students work with faculty and industry engineers on practical AI-chip, VLSI/EDA, hardware–software co-design, and intelligent-system problems, with opportunities to publish internationally.',
-  },
-  values: [
-    { zh: '真實產業議題與大型合作團隊', en: 'Real industrial problems and large collaborative teams' },
-    { zh: '演算法、模型、硬體與系統實作', en: 'Algorithms, models, hardware, and full-system implementation' },
-    { zh: '國際投稿與海外發表經驗', en: 'International publication and presentation opportunities' },
-    { zh: '鼓勵博士研究與跨領域發展', en: 'Support for doctoral and interdisciplinary growth' },
-  ],
-  source: {
-    label: 'Student Recruiting',
-    url: 'https://www.cs.nthu.edu.tw/~scchang/student_recruit.html',
-  },
-} as const
-
-export const externalProfiles = [
-  sources.professor,
-  sources.scholars,
-  {
-    label: 'Professor publication archive',
-    url: 'https://www.cs.nthu.edu.tw/~scchang/publication.html',
-  },
-  {
-    label: 'Google Scholar',
-    url: 'https://scholar.google.com/citations?hl=en&user=LXaFMMAAAAAJ',
   },
 ] as const

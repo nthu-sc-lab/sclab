@@ -5,9 +5,9 @@ import { NavLink, useLocation } from 'react-router'
 const navigation = [
   { to: '/research', label: 'Research' },
   { to: '/people', label: 'Members' },
+  { to: '/awards', label: 'Awards' },
   { to: '/publications', label: 'Publications' },
-  { to: '/highlights', label: 'Highlights' },
-  { to: '/join', label: 'Join us' },
+  { to: '/gallery', label: 'Gallery' },
   { to: '/contact', label: 'Contact' },
 ]
 
@@ -92,25 +92,18 @@ export function Layout({ children }: { children: ReactNode }) {
                 <small>NATIONAL TSING HUA UNIVERSITY</small>
               </span>
             </div>
-            <p className="footer-motto">
-              把智慧系統，做成可靠的實體。
-              <br />
-              <span lang="en">Intelligence, built into reality.</span>
-            </p>
+            <p className="footer-description">VLSI / CAD research group<br />Department of Computer Science, NTHU</p>
           </div>
           <div>
             <p className="footer-label">CONTACT</p>
             <a href="mailto:scchang@cs.nthu.edu.tw"><Mail size={15} /> scchang@cs.nthu.edu.tw</a>
             <a href="https://www.cs.nthu.edu.tw/~scchang/" target="_blank" rel="noreferrer">
-              <ArrowUpRight size={15} /> 教授官方頁面
+              <ArrowUpRight size={15} /> Professor profile
             </a>
           </div>
           <div>
             <p className="footer-label">EXPLORE</p>
-            <NavLink to="/archive"><ArrowUpRight size={15} /> 實驗室歷史典藏</NavLink>
-            <a href="https://sites.google.com/site/nthuvlsisclab/" target="_blank" rel="noreferrer">
-              <ArrowUpRight size={15} /> 舊網站 Archive
-            </a>
+            <NavLink to="/archive"><ArrowUpRight size={15} /> Archive</NavLink>
           </div>
         </div>
         <div className="footer-bottom">

@@ -10,6 +10,7 @@ export type PaperCategoryId = (typeof PAPER_CATEGORY_IDS)[number]
 export interface PaperCategory {
   readonly id: PaperCategoryId
   readonly label: string
+  readonly englishLabel: string
   readonly description: string
 }
 
@@ -21,25 +22,29 @@ export interface PaperClassification {
 export const PAPER_CATEGORIES: readonly PaperCategory[] = [
   {
     id: 'ai-acceleration',
-    label: 'AI 模型壓縮與硬體加速',
-    description: '高效 AI 推論、模型壓縮、記憶體內運算與硬體感知設計',
+    label: 'AI 模型與硬體加速',
+    englishLabel: 'AI Models & Hardware Acceleration',
+    description: 'AI 模型、模型壓縮、推論最佳化，以及面向硬體的高效運算架構。',
   },
   {
     id: 'eda-power-integrity',
-    label: 'EDA、時序與電源完整性',
-    description: '互連、時序、動態壓降與電源分佈網路分析及最佳化',
+    label: '電源完整性與設計自動化',
+    englishLabel: 'Power Integrity & Design Automation',
+    description: '電源分佈網路、時序、封裝、可靠度與積體電路設計自動化。',
   },
   {
     id: 'computer-vision',
-    label: '電腦視覺',
-    description: '3D 人體建模、事件視覺與深度估計',
+    label: '電腦視覺與事件感知',
+    englishLabel: 'Computer Vision & Event-based Perception',
+    description: '電腦視覺、事件相機、3D 人體建模、姿態理解與深度估計。',
   },
   {
     id: 'speech-audio',
-    label: '語音與音訊 AI',
-    description: '關鍵字偵測、語音活動偵測與語音增強',
+    label: '語音與音訊處理',
+    englishLabel: 'Speech & Audio Processing',
+    description: '語音辨識、關鍵字偵測、語音活動偵測與低功耗音訊 AI。',
   },
-]
+] as const
 
 export const PAPER_CATEGORY_BY_ID: Readonly<Record<PaperCategoryId, PaperCategory>> = {
   'ai-acceleration': PAPER_CATEGORIES[0],
@@ -48,91 +53,110 @@ export const PAPER_CATEGORY_BY_ID: Readonly<Record<PaperCategoryId, PaperCategor
   'speech-audio': PAPER_CATEGORIES[3],
 }
 
-/**
- * A deliberately curated taxonomy. The original titles remain untouched; these
- * tags normalize wording such as 校準／校正 and 內存計算／CIM for aggregation.
- */
-export const PAPER_TAXONOMY: Readonly<Record<number, PaperClassification>> = {
-  1: {
-    categoryId: 'ai-acceleration',
-    tags: ['AI 推論', 'Transformer', 'Softmax', '動態精度', '模型加速'],
+const CATEGORY_RULES: readonly {
+  readonly id: PaperCategoryId
+  readonly patterns: readonly RegExp[]
+}[] = [
+  {
+    id: 'speech-audio',
+    patterns: [
+      /語音|音訊|音頻|關鍵字/u,
+      /speech|audio|keyword\s*spotting|voice\s*activity/i,
+    ],
   },
-  2: {
-    categoryId: 'eda-power-integrity',
-    tags: ['深度學習', '晶粒互連', '散射參數', '預測'],
+  {
+    id: 'computer-vision',
+    patterns: [
+      /電腦視覺|影像|圖像|姿態|骨架|步態|事件相機|事件視覺|深度估計|3D|JPEG/u,
+      /computer\s*vision|image|vision|event\s*camera|depth|gait|skeleton|JPEG/i,
+    ],
   },
-  3: {
-    categoryId: 'ai-acceleration',
-    tags: ['圖神經網路', 'AI 推論', '模型加速', '資料重疊'],
+  {
+    id: 'ai-acceleration',
+    patterns: [
+      /人工智慧|機器學習|深度學習|神經網路|類神經|強化學習|量化|模型|推理|推論|稀疏|語意|分類|大型語言/u,
+      /artificial\s*intelligence|machine\s*learning|deep\s*learning|neural|reinforcement|quantization|model|inference|sparse|language|LLM|transformer/i,
+    ],
   },
-  4: {
-    categoryId: 'ai-acceleration',
-    tags: ['深度學習', '稀疏矩陣乘法', '模型加速', 'AI 硬體'],
+  {
+    id: 'eda-power-integrity',
+    patterns: [
+      /晶片|電源|電壓|時序|時脈|電路|積體電路|VLSI|封裝|中介層|矽穿孔|可靠|功耗|功率|延遲|匯流排|邏輯合成|設計自動化/u,
+      /chip|power|voltage|timing|clock|circuit|VLSI|package|interposer|TSV|reliab|power\s*gating|logic\s*synthesis|design\s*automation|IR-?drop/i,
+    ],
   },
-  5: {
-    categoryId: 'eda-power-integrity',
-    tags: ['深度學習', '時序預測', '多角分析', '預測'],
-  },
-  6: {
-    categoryId: 'computer-vision',
-    tags: ['3D 人體建模', '單張影像', '模型著色'],
-  },
-  7: {
-    categoryId: 'computer-vision',
-    tags: ['事件視覺', '事件相機', 'Transformer', '時空注意力', '影像除雨'],
-  },
-  8: {
-    categoryId: 'computer-vision',
-    tags: ['事件視覺', '事件相機', '單目深度估計', '深度估計'],
-  },
-  9: {
-    categoryId: 'eda-power-integrity',
-    tags: ['機器學習', '動態壓降', '封裝效應', '電源完整性', '預測'],
-  },
-  10: {
-    categoryId: 'eda-power-integrity',
-    tags: ['電源分佈網路', '電容器配置', '電源完整性', '最佳化'],
-  },
-  11: {
-    categoryId: 'eda-power-integrity',
-    tags: ['機器學習', '動態壓降', '資料增強', '電源完整性', '預測'],
-  },
-  12: {
-    categoryId: 'ai-acceleration',
-    tags: ['記憶體內運算 (CIM)', 'AI 模型', '矽後校正', 'AI 硬體'],
-  },
-  13: {
-    categoryId: 'ai-acceleration',
-    tags: ['後訓練量化', '模型壓縮', '輸入雜訊', 'AI 推論'],
-  },
-  14: {
-    categoryId: 'ai-acceleration',
-    tags: ['後訓練量化', '模型壓縮', '零點量化', 'AI 推論'],
-  },
-  15: {
-    categoryId: 'ai-acceleration',
-    tags: ['神經架構搜尋', '硬體感知', '峰值記憶體', '模型壓縮'],
-  },
-  16: {
-    categoryId: 'ai-acceleration',
-    tags: ['記憶體內運算 (CIM)', '深度學習', '矽後校正', 'AI 硬體'],
-  },
-  17: {
-    categoryId: 'eda-power-integrity',
-    tags: ['電源分佈網路', '阻抗預測', '極點候選網路', '電源完整性', '預測'],
-  },
-  18: {
-    categoryId: 'speech-audio',
-    tags: ['語音 AI', '關鍵字偵測', '語音活動偵測', '低功耗 AI'],
-  },
-  19: {
-    categoryId: 'speech-audio',
-    tags: ['語音 AI', '關鍵字偵測', '早期退出'],
-  },
-  20: {
-    categoryId: 'speech-audio',
-    tags: ['語音 AI', '語音增強', '雜訊消除', '注意力機制'],
-  },
+] as const
+
+const TAG_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
+  { label: 'AI 模型', pattern: /AI\s*模型|AI\s*model|人工智慧|artificial\s*intelligence/i },
+  { label: '深度學習', pattern: /深度學習|deep\s*learning/i },
+  { label: '機器學習', pattern: /機器學習|machine\s*learning/i },
+  { label: '神經網路', pattern: /神經網路|類神經|neural\s*network/i },
+  { label: 'Transformer', pattern: /transformer/i },
+  { label: '大型語言模型', pattern: /大型語言模型|large\s*language\s*model|LLM/i },
+  { label: '模型壓縮', pattern: /模型壓縮|model\s*compression/i },
+  { label: '量化', pattern: /量化|quantization/i },
+  { label: '神經架構搜尋', pattern: /神經網路搜索|神經架構搜尋|neural\s*architecture\s*search/i },
+  { label: '圖神經網路', pattern: /圖神經網路|graph\s*neural\s*network/i },
+  { label: '記憶體內運算', pattern: /內存計算|記憶體內運算|computing-in-memory|CIM/i },
+  { label: '電源完整性', pattern: /電源完整性|power\s*integrity/i },
+  { label: '電源分佈網路', pattern: /電源分佈網路|power\s*distribution\s*network|PDN/i },
+  { label: '動態壓降', pattern: /動態壓降|IR-?drop|voltage\s*drop/i },
+  { label: '時序分析', pattern: /時序分析|timing\s*analysis/i },
+  { label: '時脈樹', pattern: /時脈樹|時鐘樹|clock\s*tree|clock\s*network/i },
+  { label: '封裝與3D晶片', pattern: /封裝|3D[- ]?IC|三維晶片|interposer|TSV|chiplet/i },
+  { label: '設計自動化', pattern: /設計自動化|design\s*automation|EDA/i },
+  { label: '可靠度', pattern: /可靠度|可靠性|reliability/i },
+  { label: '電腦視覺', pattern: /電腦視覺|computer\s*vision/i },
+  { label: '事件相機', pattern: /事件相機|事件視覺|event\s*camera/i },
+  { label: '深度估計', pattern: /深度估計|depth\s*estimation/i },
+  { label: '3D 人體建模', pattern: /3D人體|3D 人體|人體模型|3D\s*(human|avatar)|human\s*model/i },
+  { label: '影像辨識', pattern: /影像辨識|圖像識別|image\s*recognition/i },
+  { label: '語音 AI', pattern: /語音|speech|audio/i },
+  { label: '關鍵字偵測', pattern: /關鍵字|keyword\s*spotting/i },
+  { label: '語音活動偵測', pattern: /語音活動|voice\s*activity/i },
+  { label: '語音增強', pattern: /語音增強|speech\s*enhancement/i },
+  { label: '低功耗', pattern: /低功耗|低能耗|low[- ]power|power\s*efficien/i },
+  { label: '強化學習', pattern: /強化學習|reinforcement\s*learning/i },
+  { label: '邏輯合成', pattern: /邏輯合成|logic\s*synthesis/i },
+  { label: '時序變異', pattern: /時序|時脈|clock|timing|delay|PVT/i },
+  { label: '硬體加速', pattern: /硬體加速|hardware\s*acceleration|GPU|CUDA/i },
+]
+
+function pushUnique(target: string[], value: string): void {
+  const normalized = value.trim().replace(/[.,;:()[\]{}]+$/gu, '')
+  if (normalized.length >= 2 && !target.includes(normalized)) target.push(normalized)
+}
+
+/** Classify a catalogue record from its title and library subject metadata. */
+export function classifyPaperText(text: string): PaperClassification {
+  const category = CATEGORY_RULES
+    .map((rule) => ({
+      id: rule.id,
+      score: rule.patterns.reduce((score, pattern) => score + (pattern.test(text) ? 1 : 0), 0),
+    }))
+    .sort((left, right) => right.score - left.score)[0]
+
+  const tags: string[] = []
+  for (const { label, pattern } of TAG_PATTERNS) {
+    if (pattern.test(text)) pushUnique(tags, label)
+  }
+
+  const metadataTokens = text
+    .replace(/[|/、，。；：,:;]+/gu, ' ')
+    .split(/\s+/u)
+  for (const token of metadataTokens) {
+    const cleaned = token.replace(/^[()[\]{}]+|[()[\]{}.,;:]+$/gu, '')
+    if (/^[\p{Script=Han}]{2,}$/u.test(cleaned)) pushUnique(tags, cleaned)
+    else if (/^[A-Z][A-Z0-9-]{1,}$/u.test(cleaned)) pushUnique(tags, cleaned)
+  }
+
+  if (tags.length === 0) pushUnique(tags, 'VLSI / CAD')
+
+  return {
+    categoryId: category.score > 0 ? category.id : 'eda-power-integrity',
+    tags,
+  }
 }
 
 export function isPaperCategoryId(value: string): value is PaperCategoryId {

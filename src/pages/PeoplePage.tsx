@@ -1,38 +1,76 @@
+import { useMemo, useState } from 'react'
+import { Search, UserRound } from 'lucide-react'
 import { ExternalLink, PageHero, SectionHeading, SourceBadge } from '../components/Shared'
-import { historicalPeople, peopleSource } from '../data/archive'
-import {
-  externalProfiles,
-  professor,
-  professorMilestones,
-  sources,
-} from '../data/siteContent'
+import { historicalPeople, peopleSource, type HistoricalPerson } from '../data/archive'
+import { professor, professorMilestones, professorPhoto } from '../data/siteContent'
+
+const formerMemberGroups: readonly { id: HistoricalPerson['group']; title: string }[] = [
+  { id: 'phd', title: 'Ph.D. Students' },
+  { id: 'master', title: "Master's Students" },
+  { id: 'alumni', title: 'Alumni' },
+  { id: 'collaborator', title: 'Collaborators' },
+  { id: 'staff', title: 'Staff' },
+]
+
+type MemberGroupFilter = HistoricalPerson['group'] | 'all'
+
+const memberFilters: readonly { id: MemberGroupFilter; title: string }[] = [
+  { id: 'all', title: 'All members' },
+  ...formerMemberGroups,
+]
+
+const currentMemberSlots = Array.from({ length: 6 }, (_, index) => index)
 
 export function PeoplePage() {
-  const alumniCount = historicalPeople.filter((person) => person.group === 'alumni').length
+  const [activeGroup, setActiveGroup] = useState<MemberGroupFilter>('all')
+  const [query, setQuery] = useState('')
+  const normalizedQuery = query.trim().toLocaleLowerCase('zh-TW')
+
+  const visibleMembers = useMemo(
+    () => historicalPeople.filter((person) => {
+      if (activeGroup !== 'all' && person.group !== activeGroup) return false
+      if (!normalizedQuery) return true
+      return [person.name, person.period, person.detail]
+        .filter(Boolean)
+        .join(' ')
+        .toLocaleLowerCase('zh-TW')
+        .includes(normalizedQuery)
+    }),
+    [activeGroup, normalizedQuery],
+  )
 
   return (
     <>
       <PageHero
         eyebrow="PEOPLE"
-        title="一個跨越模型與晶片的研究團隊"
-        english="People behind the systems"
-        description="只將可由官方來源驗證的資料列為現況；舊站成員全部保留在有年代註記的歷史典藏。"
+        title="研究團隊"
+        english="Members"
+        description="由張世杰教授帶領，研究團隊匯聚人工智慧、積體電路與設計自動化領域的研究人才。"
       />
 
       <section className="section-pad">
         <div className="container profile-layout">
-          <div className="profile-photo profile-monogram" aria-label="Shih-Chieh Chang monogram portrait">
-            <span>SC</span>
-            <small>AI × VLSI</small>
-          </div>
+          <figure className="profile-photo professor-photo">
+            <img
+              src={professorPhoto.member}
+              alt="Professor Shih-Chieh Chang"
+              loading="lazy"
+              onError={(event) => {
+                event.currentTarget.onerror = null
+                event.currentTarget.src = professorPhoto.fallback
+              }}
+            />
+            <figcaption className="photo-caption">
+              <span>PROFESSOR</span>
+              <strong>Shih-Chieh Chang</strong>
+            </figcaption>
+          </figure>
           <div className="profile-content">
             <p className="eyebrow">PRINCIPAL INVESTIGATOR</p>
-            <h2>{professor.name.zh}</h2>
-            <p className="profile-title" lang="en">{professor.name.en}</p>
+            <h2 lang="en">Shih-Chieh Chang</h2>
+            <p className="profile-title">張世杰教授</p>
             <h3>{professor.title.zh}</h3>
-            <p lang="en">{professor.title.en}</p>
             <p>{professor.introduction.zh}</p>
-            <p lang="en">{professor.introduction.en}</p>
 
             <div className="profile-meta">
               <div className="profile-card">
@@ -50,12 +88,6 @@ export function PeoplePage() {
                 </div>
               ))}
             </div>
-
-            <div className="filter-row">
-              {externalProfiles.map((profile) => (
-                <ExternalLink key={profile.url} href={profile.url}>{profile.label}</ExternalLink>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -63,10 +95,9 @@ export function PeoplePage() {
       <section className="section-compact">
         <div className="container">
           <SectionHeading
-            eyebrow="SELECTED MILESTONES"
-            title="學術與產業經歷"
-            english="Academic and industrial leadership"
-            description="精選里程碑來自清大學者系統與工研院官方頁；完整職務紀錄請由來源連結查閱。"
+            eyebrow="APPOINTMENTS"
+            title="學術與專業經歷"
+            english="Appointments"
           />
           <div className="milestone-list">
             {professorMilestones.map((milestone) => (
@@ -83,30 +114,120 @@ export function PeoplePage() {
         </div>
       </section>
 
-      <section className="section-pad dark-section">
-        <div className="container split-feature">
-          <div>
-            <SectionHeading
-              eyebrow="HISTORICAL ROSTER"
-              title="不把歷史名單冒充成現況"
-              english="An archive, clearly dated"
-              description={`舊站保存了博士生、碩士生、合作人員與至少 ${alumniCount} 位歷屆成員紀錄。由於資料多停在 2020 年前，新站完整保留但一律標示為歷史資料。`}
-            />
-            <ExternalLink href={peopleSource.url}>查看舊站原始名單 Original roster</ExternalLink>
-          </div>
-          <div className="signal-panel" aria-hidden="true">
-            <div className="signal-line" />
-            <div className="signal-labels">
-              <span>2000 — 2020</span>
-              <span>VERIFIED AS ARCHIVE</span>
-            </div>
+      <section className="section-pad current-members-section">
+        <div className="container">
+          <SectionHeading title="現任成員" english="Current Members" />
+          <div className="current-member-grid" aria-label="Current member profiles">
+            {currentMemberSlots.map((slot) => (
+              <article className="current-member-placeholder" key={slot} aria-label="Empty current member profile">
+                <div className="current-member-photo" aria-hidden="true">
+                  <UserRound size={30} strokeWidth={1.35} />
+                </div>
+                <div className="current-member-placeholder-copy" aria-hidden="true">
+                  <span />
+                  <span />
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section-compact">
+      <section className="section-pad former-members-section">
         <div className="container">
-          <SourceBadge href={sources.scholars.url} label="清大學者系統 NTHU Scholars" />
+          <SectionHeading title="歷屆成員" english="Former Members" />
+          <div className="member-directory-summary">
+            <div><strong>{historicalPeople.length}</strong><span>TOTAL RECORDS</span></div>
+            <div><strong>{historicalPeople.filter((person) => person.group === 'phd').length}</strong><span>PH.D. STUDENTS</span></div>
+            <div><strong>{historicalPeople.filter((person) => person.group === 'master').length}</strong><span>MASTER'S STUDENTS</span></div>
+            <div><strong>{historicalPeople.filter((person) => person.group === 'alumni').length}</strong><span>ALUMNI</span></div>
+          </div>
+
+          <div className="member-directory-controls">
+            <label className="member-search" htmlFor="member-search">
+              <span className="member-search-label">Search</span>
+              <div className="member-search-box">
+                <Search size={17} aria-hidden="true" />
+                <input
+                  id="member-search"
+                  value={query}
+                  placeholder="Name, period, or research topic"
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+              </div>
+            </label>
+            <div className="member-filter-row" role="group" aria-label="Filter members by category">
+              {memberFilters.map((filter) => (
+                <button
+                  className={activeGroup === filter.id ? 'member-filter active' : 'member-filter'}
+                  key={filter.id}
+                  type="button"
+                  aria-pressed={activeGroup === filter.id}
+                  onClick={() => setActiveGroup(filter.id)}
+                >
+                  {filter.title}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="member-result-bar" aria-live="polite">
+            <span>{visibleMembers.length} member records</span>
+            {query && <span>SEARCH / {query}</span>}
+          </div>
+
+          {visibleMembers.length === 0 ? (
+            <div className="empty-state">No member records match the current filters.</div>
+          ) : (
+            <div className="member-directory-groups">
+              {formerMemberGroups
+                .map((group) => ({
+                  ...group,
+                  members: visibleMembers.filter((person) => person.group === group.id),
+                }))
+                .filter((group) => group.members.length > 0)
+                .map((group) => (
+                  <section className="member-directory-group" key={group.id}>
+                    <div className="member-directory-group-head">
+                      <div>
+                        <p className="eyebrow">{group.id.toUpperCase()}</p>
+                        <h3 lang="en">{group.title}</h3>
+                      </div>
+                      <span>{group.members.length} RECORDS</span>
+                    </div>
+                    <div className="member-card-grid">
+                      {group.members.map((person, index) => (
+                        <article className="member-card" key={`${group.id}-${person.name}-${person.period}`}>
+                          <div className="member-photo-slot" aria-hidden="true">
+                            {person.photo ? <img src={person.photo} alt="" loading="lazy" /> : <span>{person.name.trim().slice(0, 1)}</span>}
+                          </div>
+                          <div className="member-card-content">
+                            <div className="member-card-top">
+                              <span className="member-card-id">{String(index + 1).padStart(2, '0')}</span>
+                              <span>{person.period}</span>
+                            </div>
+                            <h4>{person.name}</h4>
+                            <div className="member-card-details">
+                              {person.degree && <div><span>DEGREE</span><p>{person.degree}</p></div>}
+                              {person.thesis && <div><span>THESIS / RESEARCH</span><p>{person.thesis}</p></div>}
+                              {person.status && <div><span>STATUS</span><p>{person.status}</p></div>}
+                              {person.detail && <div><span>RECORD</span><p>{person.detail}</p></div>}
+                              {!person.degree && !person.thesis && !person.status && !person.detail && (
+                                <p className="member-card-empty">Roster entry only.</p>
+                              )}
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+            </div>
+          )}
+
+          <div className="member-source-link">
+            <ExternalLink href={peopleSource.url}>Source roster</ExternalLink>
+          </div>
         </div>
       </section>
     </>
