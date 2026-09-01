@@ -47,7 +47,25 @@ export interface AwardRecord {
   readonly source: SourceReference
 }
 
+export const featuredHonor = {
+  year: '2025',
+  title: '第 32 屆東元獎',
+  detail: '32nd TECO Award — Electrical / Information / Communication Technology',
+  scope: 'faculty',
+  source: sources.tecoAward,
+  category: '電機／資訊／通訊科技',
+  description: '表彰張世杰教授長期投入半導體晶片最佳化設計、AI 晶片研發與產學合作，對臺灣半導體研究能量及產業發展的貢獻。',
+  image: `${import.meta.env.BASE_URL}teco-award-2025.jpg`,
+  imageSource: sources.nthuTecoAward,
+} as const satisfies AwardRecord & {
+  readonly category: string
+  readonly description: string
+  readonly image: string
+  readonly imageSource: SourceReference
+}
+
 export const honors: readonly AwardRecord[] = [
+  featuredHonor,
   {
     year: '2025',
     title: '聯發科技前瞻研發中心（MARC）傑出研究獎',
@@ -493,8 +511,8 @@ export const historicalPeople: readonly HistoricalPerson[] = [
     ['Tien-Fu Chen', 'Historical cooperator'], ['Wen-Ben Jone', 'Historical cooperator'],
     ['Cheng-Hung Lin', 'Historical cooperator'], ['Chun-Yao Wang', 'Historical cooperator'],
     ['Yiyu Shi', 'Historical cooperator'], ['Yung-Chih Chen', 'Historical cooperator'],
-  ].map(([name, period]) => ({ name, period, group: 'collaborator' as const, detail: 'Collaborator record' })),
-  { name: '周惠珍 Jane Chou', period: 'Archive record', group: 'staff', detail: 'Laboratory staff' },
+  ].map(([name]) => ({ name, period: 'Current', group: 'collaborator' as const, detail: 'Research collaborator' })),
+  { name: '周惠珍 Jane Chou', period: 'Current', group: 'staff', detail: 'Laboratory staff' },
 ]
 
 export const peopleSource = {

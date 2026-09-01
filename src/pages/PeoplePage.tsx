@@ -1,18 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Search, UserRound } from 'lucide-react'
-import { ExternalLink, PageHero, SectionHeading, SourceBadge } from '../components/Shared'
-import { historicalPeople, peopleSource, type HistoricalPerson } from '../data/archive'
-import { professor, professorMilestones, professorPhoto } from '../data/siteContent'
+import { ExternalLink, PageHero, SectionHeading } from '../components/Shared'
+import { historicalPeople, peopleSource } from '../data/archive'
 
-const formerMemberGroups: readonly { id: HistoricalPerson['group']; title: string }[] = [
+type FormerMemberGroup = 'phd' | 'master' | 'alumni'
+
+const formerMemberGroups: readonly { id: FormerMemberGroup; title: string }[] = [
   { id: 'phd', title: 'Ph.D. Students' },
   { id: 'master', title: "Master's Students" },
   { id: 'alumni', title: 'Alumni' },
-  { id: 'collaborator', title: 'Collaborators' },
-  { id: 'staff', title: 'Staff' },
 ]
 
-type MemberGroupFilter = HistoricalPerson['group'] | 'all'
+type MemberGroupFilter = FormerMemberGroup | 'all'
 
 const memberFilters: readonly { id: MemberGroupFilter; title: string }[] = [
   { id: 'all', title: 'All members' },
@@ -20,6 +19,21 @@ const memberFilters: readonly { id: MemberGroupFilter; title: string }[] = [
 ]
 
 const currentMemberSlots = Array.from({ length: 6 }, (_, index) => index)
+const formerMembers = historicalPeople.filter((person) => (
+  person.group === 'phd' || person.group === 'master' || person.group === 'alumni'
+))
+const currentMemberGroups = [
+  {
+    id: 'collaborator',
+    title: 'Collaborators',
+    people: historicalPeople.filter((person) => person.group === 'collaborator'),
+  },
+  {
+    id: 'staff',
+    title: 'Staff',
+    people: historicalPeople.filter((person) => person.group === 'staff'),
+  },
+] as const
 
 export function PeoplePage() {
   const [activeGroup, setActiveGroup] = useState<MemberGroupFilter>('all')
@@ -27,7 +41,7 @@ export function PeoplePage() {
   const normalizedQuery = query.trim().toLocaleLowerCase('zh-TW')
 
   const visibleMembers = useMemo(
-    () => historicalPeople.filter((person) => {
+    () => formerMembers.filter((person) => {
       if (activeGroup !== 'all' && person.group !== activeGroup) return false
       if (!normalizedQuery) return true
       return [person.name, person.period, person.detail]
@@ -42,81 +56,19 @@ export function PeoplePage() {
   return (
     <>
       <PageHero
-        eyebrow="PEOPLE"
-        title="研究團隊"
+        eyebrow="ABOUT / MEMBERS"
+        title="團隊成員"
         english="Members"
-        description="由張世杰教授帶領，研究團隊匯聚人工智慧、積體電路與設計自動化領域的研究人才。"
+        description="匯聚人工智慧、積體電路與設計自動化領域的研究人才，記錄現任與歷屆團隊成員。"
       />
-
-      <section className="section-pad">
-        <div className="container profile-layout">
-          <figure className="profile-photo professor-photo">
-            <img
-              src={professorPhoto.member}
-              alt="Professor Shih-Chieh Chang"
-              loading="lazy"
-              onError={(event) => {
-                event.currentTarget.onerror = null
-                event.currentTarget.src = professorPhoto.fallback
-              }}
-            />
-            <figcaption className="photo-caption">
-              <span>PROFESSOR</span>
-              <strong>Shih-Chieh Chang</strong>
-            </figcaption>
-          </figure>
-          <div className="profile-content">
-            <p className="eyebrow">PRINCIPAL INVESTIGATOR</p>
-            <h2 lang="en">Shih-Chieh Chang</h2>
-            <p className="profile-title">張世杰教授</p>
-            <h3>{professor.title.zh}</h3>
-            <p>{professor.introduction.zh}</p>
-
-            <div className="profile-meta">
-              <div className="profile-card">
-                <small>Research units</small>
-                <p>資訊工程學系<br />半導體研究學院</p>
-              </div>
-              <div className="profile-card">
-                <small>Office</small>
-                <p>{professor.office}<br />{professor.phone}</p>
-              </div>
-              {professor.education.map((education) => (
-                <div className="profile-card" key={education}>
-                  <small>Education</small>
-                  <p lang="en">{education}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-compact">
-        <div className="container">
-          <SectionHeading
-            eyebrow="APPOINTMENTS"
-            title="學術與專業經歷"
-            english="Appointments"
-          />
-          <div className="milestone-list">
-            {professorMilestones.map((milestone) => (
-              <div className="milestone" key={`${milestone.period}-${milestone.title}`}>
-                <time>{milestone.period}</time>
-                <div>
-                  <p>{milestone.title}</p>
-                  <p lang="en">{milestone.english}</p>
-                  <SourceBadge href={milestone.source.url} label={milestone.source.label} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="section-pad current-members-section">
         <div className="container">
           <SectionHeading title="現任成員" english="Current Members" />
+          <div className="current-member-group-head">
+            <p className="eyebrow">STUDENTS</p>
+            <span>學生資料待補</span>
+          </div>
           <div className="current-member-grid" aria-label="Current member profiles">
             {currentMemberSlots.map((slot) => (
               <article className="current-member-placeholder" key={slot} aria-label="Empty current member profile">
@@ -130,6 +82,32 @@ export function PeoplePage() {
               </article>
             ))}
           </div>
+
+          <div className="current-affiliate-groups">
+            {currentMemberGroups.map((group) => (
+              <section key={group.id}>
+                <div className="current-member-group-head">
+                  <p className="eyebrow">{group.id.toUpperCase()}</p>
+                  <span>{group.people.length} CURRENT</span>
+                </div>
+                <h3 className="current-affiliate-title" lang="en">{group.title}</h3>
+                <div className="current-affiliate-grid">
+                  {group.people.map((person) => (
+                    <article className="current-affiliate-card" key={`${group.id}-${person.name}`}>
+                      <div className="current-affiliate-avatar" aria-hidden="true">
+                        {person.name.trim().slice(0, 1)}
+                      </div>
+                      <div>
+                        <span>CURRENT</span>
+                        <h4>{person.name}</h4>
+                        <p>{person.detail}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -137,10 +115,10 @@ export function PeoplePage() {
         <div className="container">
           <SectionHeading title="歷屆成員" english="Former Members" />
           <div className="member-directory-summary">
-            <div><strong>{historicalPeople.length}</strong><span>TOTAL RECORDS</span></div>
-            <div><strong>{historicalPeople.filter((person) => person.group === 'phd').length}</strong><span>PH.D. STUDENTS</span></div>
-            <div><strong>{historicalPeople.filter((person) => person.group === 'master').length}</strong><span>MASTER'S STUDENTS</span></div>
-            <div><strong>{historicalPeople.filter((person) => person.group === 'alumni').length}</strong><span>ALUMNI</span></div>
+            <div><strong>{formerMembers.length}</strong><span>TOTAL RECORDS</span></div>
+            <div><strong>{formerMembers.filter((person) => person.group === 'phd').length}</strong><span>PH.D. STUDENTS</span></div>
+            <div><strong>{formerMembers.filter((person) => person.group === 'master').length}</strong><span>MASTER'S STUDENTS</span></div>
+            <div><strong>{formerMembers.filter((person) => person.group === 'alumni').length}</strong><span>ALUMNI</span></div>
           </div>
 
           <div className="member-directory-controls">

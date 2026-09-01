@@ -64,6 +64,8 @@ describe('paper taxonomy and filtering', () => {
       '基於深度學習的晶粒互連散射參數預測',
     )
     expect(getPapersByTag('深度學習').length).toBeGreaterThan(0)
+    expect(filterPapers(papers, { publicationYearFrom: 2024, publicationYearTo: 2025 }))
+      .toHaveLength(filterPapers(papers, { publicationYear: 2024 }).length + filterPapers(papers, { publicationYear: 2025 }).length)
   })
 })
 

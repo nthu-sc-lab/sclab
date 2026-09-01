@@ -33,6 +33,8 @@ export interface Paper {
 export interface PaperFilters {
   readonly categoryId?: PaperCategoryId | null
   readonly publicationYear?: number | null
+  readonly publicationYearFrom?: number | null
+  readonly publicationYearTo?: number | null
   readonly graduationAcademicYear?: number | null
   readonly tag?: string | null
   readonly query?: string | null
@@ -40,6 +42,8 @@ export interface PaperFilters {
 
 export interface WordCloudOptions {
   readonly categoryId?: PaperCategoryId | null
+  readonly publicationYearFrom?: number | null
+  readonly publicationYearTo?: number | null
   readonly minDocumentFrequency?: number
 }
 
@@ -322,6 +326,8 @@ export function filterPapers(source: readonly Paper[], filters: PaperFilters = {
   return source.filter((paper) => {
     if (filters.categoryId && paper.categoryId !== filters.categoryId) return false
     if (filters.publicationYear && paper.publicationYear !== filters.publicationYear) return false
+    if (filters.publicationYearFrom && paper.publicationYear < filters.publicationYearFrom) return false
+    if (filters.publicationYearTo && paper.publicationYear > filters.publicationYearTo) return false
     if (filters.graduationAcademicYear && paper.graduationAcademicYear !== filters.graduationAcademicYear) return false
     if (normalizedTag && !paper.tags.some((tag) => normalizeForMatch(tag) === normalizedTag)) return false
     if (normalizedQuery) {
@@ -361,7 +367,11 @@ export function buildWordCloudTerms(source: readonly Paper[], options: WordCloud
   const minimum = options.minDocumentFrequency ?? 1
   if (!Number.isInteger(minimum) || minimum < 1) throw new RangeError('minDocumentFrequency must be a positive integer')
 
-  const scopedPapers = options.categoryId ? filterPapers(source, { categoryId: options.categoryId }) : source
+  const scopedPapers = filterPapers(source, {
+    categoryId: options.categoryId,
+    publicationYearFrom: options.publicationYearFrom,
+    publicationYearTo: options.publicationYearTo,
+  })
   const aggregate = new Map<string, { paperIds: Set<number>; categoryIds: Set<PaperCategoryId> }>()
 
   for (const paper of scopedPapers) {
@@ -398,4 +408,3 @@ export const paperCategoryCounts: Readonly<Record<PaperCategoryId, number>> = PA
   (counts, category) => ({ ...counts, [category.id]: papers.filter((paper) => paper.categoryId === category.id).length }),
   {} as Record<PaperCategoryId, number>,
 )
-

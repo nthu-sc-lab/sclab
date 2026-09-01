@@ -1,12 +1,20 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router";
-import { announcements } from "../data/archive";
 import {
   professorPhoto,
+  recentResearchPeriod,
   researchAreas,
+  type RecentResearchAreaId,
 } from "../data/siteContent";
 import { paperPublicationYears, papers } from "../lib/papers";
 import { Eyebrow, RouteLink } from "../components/Shared";
+
+const RESEARCH_ARTWORK_VARIANTS = {
+  "efficient-generative-ai": 0,
+  "physical-ai-robotics": 3,
+  "ai-semiconductor-design": 1,
+  "event-3d-vision": 2,
+} satisfies Record<RecentResearchAreaId, number>;
 
 function ResearchArtwork({ variant }: { variant: number }) {
   if (variant === 0) {
@@ -92,33 +100,29 @@ function ResearchArtwork({ variant }: { variant: number }) {
 
   return (
     <svg viewBox="0 0 420 230" aria-hidden="true">
-      <path className="art-line art-line-soft" d="M36 115h348" />
+      <path className="art-line art-line-soft" d="M210 24v182M55 115h310" />
+      <circle className="art-focus" cx="210" cy="115" r="34" />
+      <circle className="art-node" cx="210" cy="115" r="9" />
       <path
-        className="art-wave"
-        d="M36 115h34l14-35 22 78 24-115 27 151 25-105 23 55 25-99 25 143 24-80 19 49 18-42h68"
+        className="art-frame"
+        d="M62 55h74l38 42M62 175h74l38-42M358 55h-74l-38 42M358 175h-74l-38-42"
       />
-      {[65, 104, 143, 182, 221, 260, 299, 338].map((x, index) => (
-        <rect
-          className="art-bar"
-          x={x}
-          y={95 - (index % 4) * 12}
-          width="8"
-          height={40 + (index % 4) * 24}
-          rx="4"
-          key={x}
-        />
-      ))}
+      <path
+        className="art-dash"
+        d="M94 79h48M94 151h48M326 79h-48M326 151h-48"
+      />
+      {["62-55", "62-175", "358-55", "358-175"].map((point) => {
+        const [cx, cy] = point.split("-");
+        return (
+          <circle className="art-node" cx={cx} cy={cy} r="7" key={point} />
+        );
+      })}
     </svg>
   );
 }
 
 export function HomePage() {
-  const archiveSignals = announcements
-    .filter((item) => item.category === "award")
-    .slice(-3)
-    .reverse();
   const newestPublicationYear = paperPublicationYears[0] ?? "—";
-  const oldestPublicationYear = paperPublicationYears.at(-1) ?? "—";
 
   return (
     <>
@@ -126,14 +130,6 @@ export function HomePage() {
         <div className="home-hero-inner container">
           <div className="hero-layout">
             <div className="hero-main">
-              <div className="hero-identity">
-                <span className="hero-identity-mark">SC</span>
-                <span>
-                  National Tsing Hua University
-                  <br />
-                  Department of Computer Science
-                </span>
-              </div>
               <div className="hero-copy">
                 <h1>
                   <span>VLSI/CAD</span>
@@ -142,32 +138,38 @@ export function HomePage() {
                 <p className="hero-chinese">
                   國立清華大學資訊工程學系 · 張世杰教授研究團隊
                 </p>
-                <p className="hero-lead">
-                  聚焦 AI 模型與硬體加速、電源完整性與設計自動化、電腦視覺與事件感知，以及語音與音訊處理。
-                </p>
                 <div className="hero-actions">
                   <Link className="button-primary" to="/research">
                     Research <ArrowRight size={16} />
                   </Link>
-                  <Link className="button-secondary" to="/people">
+                  <Link className="button-secondary" to="/about/members">
                     Members <ArrowUpRight size={16} />
                   </Link>
                 </div>
               </div>
             </div>
             <div className="hero-visual">
-              <div className="research-led-visual">
-                <span className="research-led-visual-mark">SC</span>
-                <span className="research-led-visual-line" />
-                <div>
-                  <strong>{papers.length}</strong>
-                  <span>CATALOGUE RECORDS</span>
+              <div className="hero-photo-card">
+                <figure className="hero-cover-photo">
+                  <img
+                    src={`${import.meta.env.BASE_URL}hero-research-visual.webp`}
+                    alt="以半導體晶片、精密導線與運算節點構成的研究視覺"
+                  />
+                  <figcaption>
+                    <span>VLSI / CAD RESEARCH</span>
+                    <strong>AI × Semiconductor Design</strong>
+                  </figcaption>
+                </figure>
+                <div className="hero-cover-meta">
+                  <div>
+                    <strong>{papers.length}</strong>
+                    <span>RESEARCH RECORDS</span>
+                  </div>
+                  <div>
+                    <strong>{newestPublicationYear}</strong>
+                    <span>LATEST YEAR</span>
+                  </div>
                 </div>
-                <div>
-                  <strong>{oldestPublicationYear}—{newestPublicationYear}</strong>
-                  <span>PUBLICATION RANGE</span>
-                </div>
-                <RouteLink to="/gallery">Lab gallery</RouteLink>
               </div>
             </div>
           </div>
@@ -183,10 +185,12 @@ export function HomePage() {
         <div className="container">
           <div className="section-bar">
             <Eyebrow>RESEARCH AREAS</Eyebrow>
-            <span>AI · EDA · VISION · AUDIO</span>
+            <span>
+              {recentResearchPeriod.from}—{recentResearchPeriod.to}
+            </span>
           </div>
           <div className="section-lead-grid">
-            <h2>核心研究領域</h2>
+            <h2>近年研究領域</h2>
           </div>
           <div className="research-grid">
             {researchAreas.map((area, index) => (
@@ -196,7 +200,9 @@ export function HomePage() {
                 key={area.id}
               >
                 <div className="research-card-art">
-                  <ResearchArtwork variant={index} />
+                  <ResearchArtwork
+                    variant={RESEARCH_ARTWORK_VARIANTS[area.id]}
+                  />
                 </div>
                 <div className="research-card-content">
                   <span className="research-card-label">{area.title.zh}</span>
@@ -238,9 +244,6 @@ export function HomePage() {
               Department of Computer Science · College of Semiconductor
               Research, NTHU
             </p>
-            <p className="profile-summary">
-              研究涵蓋 AI 模型與硬體加速、電源完整性與設計自動化、電腦視覺與事件感知，以及語音與音訊處理。
-            </p>
             <div className="profile-facts">
               <div>
                 <strong>{researchAreas.length}</strong>
@@ -255,7 +258,7 @@ export function HomePage() {
                 <span>COMPUTER SCIENCE</span>
               </div>
             </div>
-            <RouteLink to="/people">View profile</RouteLink>
+            <RouteLink to="/about/advisor">View advisor profile</RouteLink>
           </div>
         </div>
       </section>
@@ -272,56 +275,35 @@ export function HomePage() {
           <div className="paper-preview-list">
             {papers
               .slice()
-              .sort((left, right) => right.publicationYear - left.publicationYear || right.id - left.id)
+              .sort(
+                (left, right) =>
+                  right.publicationYear - left.publicationYear ||
+                  right.id - left.id,
+              )
               .slice(0, 3)
               .map((paper) => (
-              <a
-                className="paper-preview"
-                href={paper.url}
-                target="_blank"
-                rel="noreferrer"
-                key={paper.id}
-              >
-                <span className="paper-preview-year">
-                  {paper.publicationYear}
-                </span>
-                <div>
-                  <h3>{paper.title}</h3>
-                  <p>
-                    {paper.englishTitle || paper.student} · {paper.department}
-                  </p>
-                </div>
-                <ArrowUpRight size={18} />
-              </a>
+                <a
+                  className="paper-preview"
+                  href={paper.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={paper.id}
+                >
+                  <span className="paper-preview-year">
+                    {paper.publicationYear}
+                  </span>
+                  <div>
+                    <h3>{paper.title}</h3>
+                    <p>
+                      {paper.englishTitle || paper.student} · {paper.department}
+                    </p>
+                  </div>
+                  <ArrowUpRight size={18} />
+                </a>
               ))}
           </div>
           <div className="section-link">
             <RouteLink to="/publications">Browse all publications</RouteLink>
-          </div>
-        </div>
-      </section>
-
-      <section className="archive-strip">
-        <div className="container archive-strip-inner">
-          <div>
-            <div className="section-bar section-bar-dark">
-              <Eyebrow>ARCHIVE</Eyebrow>
-              <span>RECORDS</span>
-            </div>
-            <h2>歷年資料</h2>
-            <p>研究專題、競賽成果與實驗室發展紀錄。</p>
-          </div>
-          <div className="archive-signal-list">
-            {archiveSignals.map((item) => (
-              <div
-                className="archive-signal"
-                key={`${item.date}-${item.title}`}
-              >
-                <time>{item.date.slice(0, 4)}</time>
-                <span>{item.title}</span>
-              </div>
-            ))}
-            <RouteLink to="/archive">Open archive</RouteLink>
           </div>
         </div>
       </section>
