@@ -2404,7 +2404,7 @@ h3 {
   gap: 14px;
   margin-bottom: 64px;
 }
-.current-member-placeholder {
+.current-member-card {
   display: grid;
   grid-template-columns: 82px minmax(0, 1fr);
   align-items: center;
@@ -2412,7 +2412,16 @@ h3 {
   min-height: 144px;
   padding: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--white);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+.current-member-card:hover {
+  border-color: #9fb4c1;
+  box-shadow: 0 16px 30px rgba(23, 50, 77, 0.08);
+  transform: translateY(-3px);
 }
 .current-member-photo {
   display: grid;
@@ -2422,6 +2431,38 @@ h3 {
   color: #90a0aa;
   border: 1px solid #ccd7dd;
   background: linear-gradient(145deg, #e9eef1, #dce5e9);
+}
+.current-member-content {
+  min-width: 0;
+}
+.current-member-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+}
+.current-member-content h3 {
+  margin: 15px 0 12px;
+  color: var(--navy);
+  font-size: 1.2rem;
+}
+.current-member-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.current-member-tags span {
+  padding: 4px 7px;
+  color: var(--blue);
+  background: var(--blue-light);
+  font-size: 0.72rem;
+}
+.current-member-tags span + span {
+  color: #8b5d48;
+  background: #f1e8e3;
 }
 .current-member-placeholder-copy {
   display: grid;
@@ -3505,6 +3546,7 @@ h3 {
     grid-template-columns: 1fr;
   }
   .member-card,
+  .current-member-card,
   .current-member-placeholder {
     grid-template-columns: 72px minmax(0, 1fr);
     gap: 14px;
