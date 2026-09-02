@@ -22,23 +22,35 @@ describe('PublicationsPage', () => {
 
     expect(screen.getByText(/顯示 124 \/ 124 篇論文 · 第 1 \/ 13 頁/)).toBeInTheDocument()
     expect(screen.getAllByRole('article')).toHaveLength(10)
+    expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true')
 
-    const topic = screen.getByRole('button', { name: /深度學習，出現在/ })
+    const topic = screen.getByRole('button', { name: /Deep Learning, appears in/ })
     const initialFill = topic.getAttribute('fill')
     fireEvent.click(topic)
 
     expect(screen.getByText(/顯示 \d+ \/ 124 篇論文 · 第 1 \/ \d+ 頁/)).toBeInTheDocument()
-    expect(screen.getByText('FILTER / 深度學習')).toBeInTheDocument()
+    expect(screen.getByText('FILTER / Deep Learning')).toBeInTheDocument()
     expect(topic).toHaveClass('active')
     expect(topic).toHaveAttribute('aria-pressed', 'true')
     expect(topic.getAttribute('fill')).not.toBe(initialFill)
+
+    fireEvent.click(screen.getByRole('button', { name: '中文' }))
+    expect(screen.getByRole('button', { name: '中文' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /深度學習，出現在/ })).toBeInTheDocument()
+    expect(screen.queryByText(/FILTER \/ Deep Learning/)).not.toBeInTheDocument()
   })
 
   it('combines the year range and free-text controls and can clear them', () => {
     render(<PublicationsPage />)
 
-    fireEvent.change(screen.getByLabelText('起始年份'), { target: { value: '2025' } })
-    fireEvent.change(screen.getByLabelText('結束年份'), { target: { value: '2025' } })
+    const startYear = screen.getByLabelText('起始年份')
+    const endYear = screen.getByLabelText('結束年份')
+
+    expect(startYear).toHaveAttribute('type', 'range')
+    expect(endYear).toHaveAttribute('type', 'range')
+
+    fireEvent.change(startYear, { target: { value: '2025' } })
+    fireEvent.change(endYear, { target: { value: '2025' } })
     expect(screen.getByText(/顯示 5 \/ 124 篇論文/)).toBeInTheDocument()
 
     fireEvent.change(screen.getByLabelText('Search'), { target: { value: '不存在的題目' } })

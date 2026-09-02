@@ -1,4 +1,10 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useMemo,
+  useState,
+  type CSSProperties,
+} from "react";
 import { useWordcloud } from "@visx/wordcloud";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { PageHero, SectionHeading } from "../components/Shared";
@@ -18,6 +24,120 @@ const CLOUD_HEIGHT = 420;
 const CLOUD_ROTATIONS = [-11, -7, -4, 0, 0, 4, 7, 11] as const;
 const newestYear = paperPublicationYears[0] ?? new Date().getFullYear();
 const oldestYear = paperPublicationYears.at(-1) ?? newestYear;
+
+type CloudLanguage = "en" | "zh";
+
+const CLOUD_TERM_ENGLISH: Readonly<Record<string, string>> = {
+  "AI 模型": "AI Models",
+  深度學習: "Deep Learning",
+  機器學習: "Machine Learning",
+  神經網路: "Neural Networks",
+  分佈偏移: "Distribution Shift",
+  語言模型: "Language Models",
+  知識檢索: "Knowledge Retrieval",
+  對話系統: "Dialogue Systems",
+  物理資訊神經算子: "Physics-Informed Neural Operators",
+  機器人抓取: "Robotic Grasping",
+  大型語言模型: "Large Language Models",
+  模型壓縮: "Model Compression",
+  量化: "Quantization",
+  神經架構搜尋: "Neural Architecture Search",
+  圖神經網路: "Graph Neural Networks",
+  記憶體內運算: "Computing-in-Memory",
+  電源完整性: "Power Integrity",
+  電源分佈網路: "Power Distribution Networks",
+  動態壓降: "Dynamic IR Drop",
+  動態電壓調節: "Dynamic Voltage Scaling",
+  時序分析: "Timing Analysis",
+  時脈樹: "Clock Trees",
+  "封裝與3D晶片": "3D IC & Packaging",
+  設計自動化: "Design Automation",
+  可靠度: "Reliability",
+  電路老化: "Circuit Aging",
+  硬體驗證: "Hardware Verification",
+  快取一致性: "Cache Coherence",
+  片上匯流排: "On-Chip Buses",
+  電腦視覺: "Computer Vision",
+  事件相機: "Event Cameras",
+  深度估計: "Depth Estimation",
+  "3D 人體建模": "3D Human Modeling",
+  影像辨識: "Image Recognition",
+  步態辨識: "Gait Recognition",
+  動作估計: "Motion Estimation",
+  "語音 AI": "Speech AI",
+  關鍵字偵測: "Keyword Spotting",
+  語音活動偵測: "Voice Activity Detection",
+  語音增強: "Speech Enhancement",
+  低功耗: "Low-Power Design",
+  強化學習: "Reinforcement Learning",
+  邏輯合成: "Logic Synthesis",
+  時序變異: "Timing Variation",
+  硬體加速: "Hardware Acceleration",
+  睡眠電晶體: "Sleep Transistors",
+  堆疊式晶片: "Stacked-Die Design",
+  最大瞬間電流: "Peak Current",
+  電源門控: "Power Gating",
+  字串比對: "String Matching",
+  軟錯誤容忍: "Soft-Error Tolerance",
+  熱感知設計: "Thermal-Aware Design",
+  工程變更: "Engineering Change Orders",
+  元件庫生成: "Cell Library Generation",
+  多核心系統: "Multi-Core Systems",
+  矽穿孔: "Through-Silicon Vias",
+  漏電流: "Leakage Current",
+  時脈偏移: "Clock Skew",
+  中介層: "Interposers",
+  步態: "Gait Analysis",
+  測試: "Testing",
+  快取: "Cache",
+  卷積神經網路: "Convolutional Neural Networks",
+  捲積神經網路: "Convolutional Neural Networks",
+} as const;
+
+const CLOUD_TERM_CHINESE = new Map(
+  Object.entries(CLOUD_TERM_ENGLISH).map(([chinese, english]) => [
+    english,
+    chinese,
+  ]),
+);
+
+function localizeCloudTerms(
+  terms: readonly PaperWordCloudTerm[],
+  language: CloudLanguage,
+): PaperWordCloudTerm[] {
+  if (language === "zh") return [...terms];
+
+  const localized = new Map<string, PaperWordCloudTerm>();
+
+  terms.forEach((term) => {
+    const text =
+      CLOUD_TERM_ENGLISH[term.text] ??
+      (!/\p{Script=Han}/u.test(term.text) ? term.text : null);
+    if (!text) return;
+
+    const existing = localized.get(text);
+    const paperIds = [
+      ...new Set([...(existing?.paperIds ?? []), ...term.paperIds]),
+    ].sort((left, right) => left - right);
+    const categoryIds = [
+      ...new Set([...(existing?.categoryIds ?? []), ...term.categoryIds]),
+    ];
+
+    localized.set(text, {
+      text,
+      value: paperIds.length,
+      documentFrequency: paperIds.length,
+      paperIds,
+      categoryIds,
+    });
+  });
+
+  return [...localized.values()].sort(
+    (left, right) =>
+      right.documentFrequency - left.documentFrequency ||
+      left.text.localeCompare(right.text, "en"),
+  );
+}
 
 function createSeededRandom(seed: number) {
   let state = seed >>> 0;
@@ -40,10 +160,12 @@ function cloudColor(frequency: number, maximum: number, isActive: boolean) {
 const ResearchWordCloud = memo(function ResearchWordCloud({
   terms,
   activeTag,
+  language,
   onTagChange,
 }: {
   terms: readonly PaperWordCloudTerm[];
   activeTag: string | null;
+  language: CloudLanguage;
   onTagChange: (tag: string) => void;
 }) {
   const maximum = terms[0]?.documentFrequency ?? 1;
@@ -63,9 +185,16 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
   const fontSize = useCallback(
     (term: PaperWordCloudTerm) => {
       const relativeFrequency = term.documentFrequency / maximum;
-      return 17 + Math.pow(relativeFrequency, 0.67) * 56;
+      const baseSize = language === "en" ? 12 : 16;
+      const growth = language === "en" ? 36 : 50;
+      const lengthScale =
+        language === "en"
+          ? Math.max(0.56, Math.min(1, Math.sqrt(12 / term.text.length)))
+          : 1;
+
+      return (baseSize + Math.pow(relativeFrequency, 0.67) * growth) * lengthScale;
     },
-    [maximum],
+    [language, maximum],
   );
   const fontWeight = useCallback(
     (term: PaperWordCloudTerm) =>
@@ -74,11 +203,13 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
   );
   const rotate = useCallback(
     (term: PaperWordCloudTerm, index: number) => {
+      const rotations =
+        language === "en" ? [-6, -4, 0, 0, 0, 4, 6] : CLOUD_ROTATIONS;
       const hash = [...term.text].reduce(
         (sum, character) => sum + (character.codePointAt(0) ?? 0),
         index * 17,
       );
-      const angle = CLOUD_ROTATIONS[hash % CLOUD_ROTATIONS.length];
+      const angle = rotations[hash % rotations.length];
 
       if (term.documentFrequency >= maximum * 0.72) {
         return Math.sign(angle) * Math.min(Math.abs(angle), 4);
@@ -86,17 +217,20 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
 
       return angle;
     },
-    [maximum],
+    [language, maximum],
   );
   const layoutTerms = useMemo(() => [...terms], [terms]);
   const cloudWords = useWordcloud({
     width: CLOUD_WIDTH,
     height: CLOUD_HEIGHT,
     words: layoutTerms,
-    font: "Noto Sans TC, IBM Plex Sans, sans-serif",
+    font:
+      language === "en"
+        ? "IBM Plex Sans, sans-serif"
+        : "Noto Sans TC, IBM Plex Sans, sans-serif",
     fontSize,
     fontWeight,
-    padding: 6,
+    padding: language === "en" ? 7 : 9,
     rotate,
     spiral: "archimedean",
     random,
@@ -107,14 +241,29 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
   );
 
   return (
-    <div className="topic-word-cloud" aria-label="可點選的研究主題文字雲">
+    <div
+      className="topic-word-cloud"
+      aria-label={
+        language === "en"
+          ? "Interactive research topic word cloud"
+          : "可點選的研究主題文字雲"
+      }
+    >
       {terms.length === 0 ? (
-        <p>此年份範圍沒有可用的主題標籤。</p>
+        <p>
+          {language === "en"
+            ? "No topic terms are available for this year range."
+            : "此年份範圍沒有可用的主題標籤。"}
+        </p>
       ) : (
         <svg
           viewBox={`0 0 ${CLOUD_WIDTH} ${CLOUD_HEIGHT}`}
           role="group"
-          aria-label="研究主題標籤；字體越大代表相關論文越多"
+          aria-label={
+            language === "en"
+              ? "Research topics; larger terms appear in more papers"
+              : "研究主題標籤；字體越大代表相關論文越多"
+          }
         >
           <g transform={`translate(${CLOUD_WIDTH / 2} ${CLOUD_HEIGHT / 2})`}>
             {cloudWords.map((word) => {
@@ -138,7 +287,11 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
                   role="button"
                   tabIndex={0}
                   aria-pressed={isActive}
-                  aria-label={`${text}，出現在 ${term.documentFrequency} 篇論文中`}
+                  aria-label={
+                    language === "en"
+                      ? `${text}, appears in ${term.documentFrequency} papers`
+                      : `${text}，出現在 ${term.documentFrequency} 篇論文中`
+                  }
                   onClick={() => onTagChange(text)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -214,9 +367,15 @@ function Pagination({
 export function PublicationsPage() {
   const [fromYear, setFromYear] = useState(oldestYear);
   const [toYear, setToYear] = useState(newestYear);
+  const [cloudLanguage, setCloudLanguage] = useState<CloudLanguage>("en");
   const [tag, setTag] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const yearSpan = Math.max(newestYear - oldestYear, 1);
+  const yearRangeStyle = {
+    "--range-start": `${((fromYear - oldestYear) / yearSpan) * 100}%`,
+    "--range-end": `${100 - ((toYear - oldestYear) / yearSpan) * 100}%`,
+  } as CSSProperties;
 
   const cloudScope = useMemo(
     () =>
@@ -227,14 +386,20 @@ export function PublicationsPage() {
     [fromYear, toYear],
   );
 
-  const cloudTerms = useMemo(
-    () =>
-      buildWordCloudTerms(papers, {
+  const cloudTerms = useMemo(() => {
+    const terms = buildWordCloudTerms(papers, {
         publicationYearFrom: fromYear,
         publicationYearTo: toYear,
-      }).slice(0, MAX_TOPIC_TAGS),
-    [fromYear, toYear],
-  );
+      });
+
+    return localizeCloudTerms(terms, cloudLanguage).slice(0, MAX_TOPIC_TAGS);
+  }, [cloudLanguage, fromYear, toYear]);
+
+  const activeCloudTag = tag
+    ? cloudLanguage === "en"
+      ? (CLOUD_TERM_ENGLISH[tag] ?? tag)
+      : tag
+    : null;
 
   const visiblePapers = useMemo(
     () =>
@@ -275,17 +440,23 @@ export function PublicationsPage() {
     tag || query || fromYear !== oldestYear || toYear !== newestYear,
   );
 
-  const handleTagChange = useCallback((nextTag: string) => {
-    setTag((current) => (current === nextTag ? null : nextTag));
-    setPage(1);
-  }, []);
+  const handleTagChange = useCallback(
+    (nextTag: string) => {
+      const sourceTag =
+        cloudLanguage === "en"
+          ? (CLOUD_TERM_CHINESE.get(nextTag) ?? nextTag)
+          : nextTag;
+      setTag((current) => (current === sourceTag ? null : sourceTag));
+      setPage(1);
+    },
+    [cloudLanguage],
+  );
 
   return (
     <>
       <PageHero
-        eyebrow="PUBLICATIONS"
-        title="研究成果"
-        english="Research Publications"
+        eyebrow="研究成果"
+        title="Publications"
         description="團隊近年論文成果。"
       />
 
@@ -315,8 +486,8 @@ export function PublicationsPage() {
           <div className="keyword-index">
             <div className="keyword-index-header">
               <SectionHeading
-                title="研究主題"
-                english="Research Topics"
+                eyebrow="研究主題"
+                title="Themes"
                 description=""
               />
               <span className="keyword-index-count">
@@ -325,59 +496,103 @@ export function PublicationsPage() {
             </div>
 
             <div className="topic-toolbar">
-              <div className="topic-scope" aria-label="研究主題範圍"></div>
+              <div
+                className="cloud-language-control"
+                aria-label="文字雲語言"
+              >
+                <span>LANGUAGE</span>
+                <div role="group" aria-label="Word cloud language">
+                  <button
+                    className={cloudLanguage === "en" ? "active" : undefined}
+                    type="button"
+                    aria-pressed={cloudLanguage === "en"}
+                    onClick={() => {
+                      setCloudLanguage("en");
+                      setTag(null);
+                      setPage(1);
+                    }}
+                  >
+                    English
+                  </button>
+                  <button
+                    className={cloudLanguage === "zh" ? "active" : undefined}
+                    type="button"
+                    aria-pressed={cloudLanguage === "zh"}
+                    onClick={() => {
+                      setCloudLanguage("zh");
+                      setTag(null);
+                      setPage(1);
+                    }}
+                  >
+                    中文
+                  </button>
+                </div>
+              </div>
 
               <div className="cloud-year-range" aria-label="文字雲年份範圍">
-                <span>YEAR RANGE</span>
-                <label>
-                  <span className="visually-hidden">起始年份</span>
-                  <select
-                    aria-label="起始年份"
+                <div className="cloud-year-range-heading">
+                  <span>YEAR RANGE</span>
+                  <output
+                    htmlFor="cloud-year-start cloud-year-end"
+                    aria-live="polite"
+                  >
+                    <strong>{fromYear}</strong>
+                    <span aria-hidden="true">—</span>
+                    <strong>{toYear}</strong>
+                  </output>
+                </div>
+                <div className="year-range-slider" style={yearRangeStyle}>
+                  <div className="year-range-track" aria-hidden="true">
+                    <span />
+                  </div>
+                  <input
+                    id="cloud-year-start"
+                    className="year-range-input year-range-input-start"
+                    type="range"
+                    min={oldestYear}
+                    max={newestYear}
+                    step="1"
                     value={fromYear}
+                    aria-label="起始年份"
+                    aria-valuetext={`${fromYear} 年`}
                     onChange={(event) => {
-                      const nextYear = Number(event.target.value);
-                      setFromYear(nextYear);
-                      if (nextYear > toYear) setToYear(nextYear);
+                      setFromYear(
+                        Math.min(Number(event.target.value), toYear),
+                      );
                       setTag(null);
                       setPage(1);
                     }}
-                  >
-                    {[...paperPublicationYears]
-                      .reverse()
-                      .map((publicationYear) => (
-                        <option key={publicationYear} value={publicationYear}>
-                          {publicationYear}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <span aria-hidden="true">—</span>
-                <label>
-                  <span className="visually-hidden">結束年份</span>
-                  <select
-                    aria-label="結束年份"
+                  />
+                  <input
+                    id="cloud-year-end"
+                    className="year-range-input year-range-input-end"
+                    type="range"
+                    min={oldestYear}
+                    max={newestYear}
+                    step="1"
                     value={toYear}
+                    aria-label="結束年份"
+                    aria-valuetext={`${toYear} 年`}
                     onChange={(event) => {
-                      const nextYear = Number(event.target.value);
-                      setToYear(nextYear);
-                      if (nextYear < fromYear) setFromYear(nextYear);
+                      setToYear(
+                        Math.max(Number(event.target.value), fromYear),
+                      );
                       setTag(null);
                       setPage(1);
                     }}
-                  >
-                    {paperPublicationYears.map((publicationYear) => (
-                      <option key={publicationYear} value={publicationYear}>
-                        {publicationYear}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                  />
+                </div>
+                <div className="year-range-limits" aria-hidden="true">
+                  <span>{oldestYear}</span>
+                  <span>{newestYear}</span>
+                </div>
               </div>
             </div>
 
             <ResearchWordCloud
               terms={cloudTerms}
-              activeTag={tag}
+              activeTag={activeCloudTag}
+              language={cloudLanguage}
               onTagChange={handleTagChange}
             />
             <div className="topic-cloud-footer">
@@ -416,7 +631,9 @@ export function PublicationsPage() {
               顯示 {visiblePapers.length} / {papers.length} 篇論文 · 第 {page} /{" "}
               {pageCount} 頁
             </span>
-            {tag && <span className="selected-filter">FILTER / {tag}</span>}
+            {tag && (
+              <span className="selected-filter">FILTER / {activeCloudTag}</span>
+            )}
           </div>
 
           {visiblePapers.length === 0 ? (

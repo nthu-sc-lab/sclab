@@ -58,6 +58,21 @@ describe('paper taxonomy and filtering', () => {
     expect(papers.every((paper) => paper.tags.length > 0)).toBe(true)
   })
 
+  it('does not turn Chinese prose fragments into research tags', () => {
+    const tags = new Set(papers.flatMap((paper) => paper.tags))
+
+    expect(tags).not.toContain('方法用於')
+    expect(tags).not.toContain('應用於')
+    expect(tags).not.toContain('之方法')
+    expect(
+      [...tags].every(
+        (tag) =>
+          !/\p{Script=Han}/u.test(tag) ||
+          !/(方法用於|應用於|之方法|以及|進行)/u.test(tag),
+      ),
+    ).toBe(true)
+  })
+
   it('combines category, year, tag, and normalized free-text filters', () => {
     expect(filterPapers(papers, { publicationYear: 2026 }).length).toBeGreaterThan(0)
     expect(filterPapers(papers, { query: 'chiplet' }).map((paper) => paper.title)).toContain(
@@ -70,6 +85,14 @@ describe('paper taxonomy and filtering', () => {
 })
 
 describe('buildWordCloudTerms', () => {
+  it('keeps the generic fallback tag exceptional', () => {
+    const fallbackPapers = papers.filter(
+      (paper) => paper.tags.length === 1 && paper.tags[0] === 'VLSI / CAD',
+    )
+
+    expect(fallbackPapers).toHaveLength(0)
+  })
+
   it('uses distinct-paper frequency and retains supporting paper ids', () => {
     const terms = buildWordCloudTerms(papers)
     const deepLearning = terms.find((term) => term.text === '深度學習')

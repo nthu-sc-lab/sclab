@@ -65,6 +65,7 @@ function RevealManager() {
     if (!main) return;
 
     const registered = new Set<HTMLElement>();
+    const firstSection = main.querySelector<HTMLElement>(":scope > section");
     const prefersReducedMotion =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -78,12 +79,13 @@ function RevealManager() {
                 observer?.unobserve(entry.target);
               });
             },
-            { threshold: 0.06, rootMargin: "0px 0px -7% 0px" },
+            { threshold: 0, rootMargin: "0px 0px -5% 0px" },
           )
         : null;
 
     const registerTargets = () => {
       main.querySelectorAll<HTMLElement>(REVEAL_SELECTOR).forEach((target) => {
+        if (firstSection?.contains(target)) return;
         if (registered.has(target)) return;
 
         const index = registered.size;
@@ -220,7 +222,13 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main id="main-content">{children}</main>
+      <main
+        id="main-content"
+        className={pathname === "/" ? "route-enter route-enter-home" : "route-enter"}
+        key={pathname}
+      >
+        {children}
+      </main>
 
       <footer className="site-footer">
         <div className="footer-grid">

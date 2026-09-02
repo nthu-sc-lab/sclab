@@ -32,6 +32,7 @@ describe('Layout interactions', () => {
     const { container } = render(
       <MemoryRouter>
         <Layout>
+          <section>Above-the-fold content</section>
           <section>
             <article>Animated card</article>
           </section>
@@ -39,12 +40,28 @@ describe('Layout interactions', () => {
       </MemoryRouter>,
     )
 
-    const section = container.querySelector('#main-content > section')
+    const sections = container.querySelectorAll('#main-content > section')
     const article = screen.getByRole('article')
 
     await waitFor(() => {
-      expect(section).toHaveClass('scroll-reveal', 'is-visible')
+      expect(sections[0]).not.toHaveClass('scroll-reveal')
+      expect(sections[1]).toHaveClass('scroll-reveal', 'is-visible')
       expect(article).toHaveClass('scroll-reveal', 'is-visible')
     })
+  })
+
+  it('marks the home route for the dedicated entrance sequence', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Layout>
+          <section>Home</section>
+        </Layout>
+      </MemoryRouter>,
+    )
+
+    expect(container.querySelector('#main-content')).toHaveClass(
+      'route-enter',
+      'route-enter-home',
+    )
   })
 })

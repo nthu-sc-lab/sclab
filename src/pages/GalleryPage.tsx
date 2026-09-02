@@ -32,9 +32,8 @@ export function GalleryPage() {
   return (
     <>
       <PageHero
-        eyebrow="LAB / GALLERY"
-        title="實驗室照片"
-        english="Lab Gallery"
+        eyebrow="實驗室照片"
+        title="Gallery"
         description="保存 SCLab 一起研究、交流與成長的時刻。"
       />
 
@@ -71,8 +70,8 @@ export function GalleryPage() {
 
           <div className="gallery-overview-copy">
             <Camera size={28} aria-hidden="true" />
-            <p className="eyebrow">LAB MOMENTS</p>
-            <h2>實驗室照片</h2>
+            <p className="eyebrow title-eyebrow">實驗室照片</p>
+            <h2 lang="en"> Photo Archive</h2>
             <div className="gallery-overview-facts">
               <div>
                 <strong>{galleryPhotos.length}</strong>
@@ -91,8 +90,8 @@ export function GalleryPage() {
         <div className="container">
           <header className="gallery-archive-header">
             <div>
-              <p className="eyebrow">PHOTO ARCHIVE</p>
-              <h2>照片集錦</h2>
+              <p className="eyebrow title-eyebrow">照片集錦</p>
+              <h2 lang="en">Photo Archive</h2>
             </div>
             <p aria-live="polite">
               {rangeStart}—{rangeEnd} / {galleryPhotos.length}

@@ -2,6 +2,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Building2,
+  GraduationCap,
   Mail,
   MapPin,
   Phone,
@@ -16,8 +17,6 @@ import {
   professor,
   professorMilestones,
   professorPhoto,
-  recentResearchPeriod,
-  researchAreas,
 } from "../data/siteContent";
 
 export function AdvisorPage() {
@@ -41,7 +40,7 @@ export function AdvisorPage() {
           </figure>
 
           <div className="advisor-intro">
-            <p className="eyebrow">ABOUT / ADVISOR</p>
+            <p className="eyebrow title-eyebrow">指導教授</p>
             <p className="advisor-name-zh">張世杰 教授</p>
             <h1 lang="en">
               Shih-Chieh
@@ -88,9 +87,8 @@ export function AdvisorPage() {
         <div className="container advisor-details-grid">
           <div>
             <SectionHeading
-              eyebrow="APPOINTMENTS"
-              title="學術與專業經歷"
-              english="Selected Appointments"
+              eyebrow="學術與專業經歷"
+              title="Academic &  Experience"
             />
             <div className="milestone-list">
               {professorMilestones.map((milestone) => (
@@ -127,9 +125,7 @@ export function AdvisorPage() {
             </div>
             {professor.education.map((education) => (
               <div className="advisor-fact" key={education}>
-                <span className="advisor-fact-mark" aria-hidden="true">
-                  ED
-                </span>
+                <GraduationCap size={19} aria-hidden="true" />
                 <div>
                   <small>EDUCATION</small>
                   <p lang="en">{education}</p>
@@ -140,14 +136,9 @@ export function AdvisorPage() {
         </div>
       </section>
 
-      <section className="section-pad advisor-courses">
+      <section className="section-pad ">
         <div className="container">
-          <SectionHeading
-            eyebrow="TEACHING"
-            title="授課紀錄"
-            english="Courses Taught"
-            description=""
-          />
+          <SectionHeading eyebrow="授課紀錄" title="Courses Taught" />
 
           <div className="course-catalog">
             <aside className="course-catalog-intro">
@@ -223,13 +214,9 @@ export function AdvisorPage() {
         </div>
       </section>
 
-      <section className="section-compact advisor-research-focus">
+      {/* <section className="section-compact advisor-research-focus">
         <div className="container">
-          <SectionHeading
-            eyebrow={`${recentResearchPeriod.from}—${recentResearchPeriod.to}`}
-            title="近期研究重點"
-            english="Recent Research Focus"
-          />
+          <SectionHeading eyebrow="近期研究重點" title="Current Research" />
           <div className="advisor-focus-list advisor-focus-grid">
             {researchAreas.map((area, index) => (
               <article key={area.id}>
@@ -247,7 +234,7 @@ export function AdvisorPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

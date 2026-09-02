@@ -94,33 +94,60 @@ const TAG_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp 
   { label: '神經網路', pattern: /神經網路|類神經|neural\s*network/i },
   { label: 'Transformer', pattern: /transformer/i },
   { label: '大型語言模型', pattern: /大型語言模型|large\s*language\s*model|LLM/i },
+  { label: '語言模型', pattern: /語言模型|language\s*model/i },
   { label: '模型壓縮', pattern: /模型壓縮|model\s*compression/i },
   { label: '量化', pattern: /量化|quantization/i },
   { label: '神經架構搜尋', pattern: /神經網路搜索|神經架構搜尋|neural\s*architecture\s*search/i },
   { label: '圖神經網路', pattern: /圖神經網路|graph\s*neural\s*network/i },
   { label: '記憶體內運算', pattern: /內存計算|記憶體內運算|computing-in-memory|CIM/i },
+  { label: '分佈偏移', pattern: /分佈偏移|distribution\s*shift/i },
+  { label: '知識檢索', pattern: /知識檢索|knowledge\s*retrieval/i },
+  { label: '對話系統', pattern: /任務導向.{0,4}對話|task[- ]oriented\s*dialogue/i },
+  { label: '物理資訊神經算子', pattern: /物理啟發神經算子|physics[- ]informed\s*neural\s*operator/i },
+  { label: '機器人抓取', pattern: /抓取生成|grasp\s*generation|GraspGen/i },
   { label: '電源完整性', pattern: /電源完整性|power\s*integrity/i },
   { label: '電源分佈網路', pattern: /電源分佈網路|power\s*distribution\s*network|PDN/i },
   { label: '動態壓降', pattern: /動態壓降|IR-?drop|voltage\s*drop/i },
+  { label: '動態電壓調節', pattern: /動態電壓.{0,6}(緩降|調配|縮放)|dynamic\s*voltage\s*scal/i },
   { label: '時序分析', pattern: /時序分析|timing\s*analysis/i },
   { label: '時脈樹', pattern: /時脈樹|時鐘樹|clock\s*tree|clock\s*network/i },
+  { label: '時脈偏移', pattern: /時脈偏移|時鐘偏移|clock\s*skew/i },
   { label: '封裝與3D晶片', pattern: /封裝|3D[- ]?IC|三維晶片|interposer|TSV|chiplet/i },
+  { label: '堆疊式晶片', pattern: /堆疊式晶片|堆疊晶片|stacked[- ]die/i },
+  { label: '矽穿孔', pattern: /矽穿孔|through[- ]silicon\s*via|TSV/i },
+  { label: '中介層', pattern: /中介層|interposer/i },
   { label: '設計自動化', pattern: /設計自動化|design\s*automation|EDA/i },
   { label: '可靠度', pattern: /可靠度|可靠性|reliability/i },
+  { label: '電路老化', pattern: /電路老化|過時化|老化問題|circuit\s*aging|aging\s*problem/i },
+  { label: '硬體驗證', pattern: /硬體驗證|系統層級.{0,6}驗證|隨機驗證|亂數驗證|design\s*verification|system[- ]level.{0,12}verification|random\s*verification/i },
+  { label: '快取一致性', pattern: /窺探式快取|探聽過濾器|竊聽過濾器|snoop\s*(filter|based\s*cache)|cache\s*coherence/i },
+  { label: '片上匯流排', pattern: /晶片內建匯流排|片上匯流排|on[- ]chip[- ]bus|AMBA/i },
   { label: '電腦視覺', pattern: /電腦視覺|computer\s*vision/i },
   { label: '事件相機', pattern: /事件相機|事件視覺|event\s*camera/i },
   { label: '深度估計', pattern: /深度估計|depth\s*estimation/i },
   { label: '3D 人體建模', pattern: /3D人體|3D 人體|人體模型|3D\s*(human|avatar)|human\s*model/i },
   { label: '影像辨識', pattern: /影像辨識|圖像識別|image\s*recognition/i },
+  { label: '步態辨識', pattern: /步態|走路姿態|walking\s*gesture|gait|skeleton\s*sequence/i },
+  { label: '動作估計', pattern: /移動估計|motion\s*estimation/i },
   { label: '語音 AI', pattern: /語音|speech|audio/i },
   { label: '關鍵字偵測', pattern: /關鍵字|keyword\s*spotting/i },
   { label: '語音活動偵測', pattern: /語音活動|voice\s*activity/i },
   { label: '語音增強', pattern: /語音增強|speech\s*enhancement/i },
-  { label: '低功耗', pattern: /低功耗|低能耗|low[- ]power|power\s*efficien/i },
+  { label: '低功耗', pattern: /低功耗|低功率|低能耗|low[- ]power|power\s*(efficien|minimization)/i },
   { label: '強化學習', pattern: /強化學習|reinforcement\s*learning/i },
   { label: '邏輯合成', pattern: /邏輯合成|logic\s*synthesis/i },
   { label: '時序變異', pattern: /時序|時脈|clock|timing|delay|PVT/i },
   { label: '硬體加速', pattern: /硬體加速|hardware\s*acceleration|GPU|CUDA/i },
+  { label: '最大瞬間電流', pattern: /最大瞬間電流|maximum\s+instan\w*\s+current/i },
+  { label: '字串比對', pattern: /字串比對|正規表示式|pattern\s*matching|regular\s*expression\s*matching|string\s*matching/i },
+  { label: '電源門控', pattern: /電源門控|電源閘控|power\s*gating/i },
+  { label: '軟錯誤容忍', pattern: /軟錯誤|soft[- ]error\s*toleran/i },
+  { label: '熱感知設計', pattern: /溫度限制|溫度感知|thermal(?:ly)?\s*constrain|thermal[- ]aware/i },
+  { label: '睡眠電晶體', pattern: /睡眠電晶體|sleep\s*transistor/i },
+  { label: '漏電流', pattern: /漏電流|leakage\s*(current|power)/i },
+  { label: '工程變更', pattern: /工程變更|engineering\s*change|spare\s*cells?/i },
+  { label: '元件庫生成', pattern: /元件庫自動產生|細胞元件庫|cell\s*library\s*generator/i },
+  { label: '多核心系統', pattern: /多核心(系統|處理器)|multi[- ]core\s*(system|processor)/i },
 ]
 
 function pushUnique(target: string[], value: string): void {
@@ -147,8 +174,10 @@ export function classifyPaperText(text: string): PaperClassification {
     .split(/\s+/u)
   for (const token of metadataTokens) {
     const cleaned = token.replace(/^[()[\]{}]+|[()[\]{}.,;:]+$/gu, '')
-    if (/^[\p{Script=Han}]{2,}$/u.test(cleaned)) pushUnique(tags, cleaned)
-    else if (/^[A-Z][A-Z0-9-]{1,}$/u.test(cleaned)) pushUnique(tags, cleaned)
+    // Chinese prose fragments such as "方法用於" or "應用於" are not
+    // meaningful research tags. Chinese terms must be explicitly curated above;
+    // only established all-caps technical abbreviations are inferred here.
+    if (/^[A-Z][A-Z0-9-]{1,}$/u.test(cleaned)) pushUnique(tags, cleaned)
   }
 
   if (tags.length === 0) pushUnique(tags, 'VLSI / CAD')

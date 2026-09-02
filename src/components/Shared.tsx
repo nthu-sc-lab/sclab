@@ -2,28 +2,21 @@ import type { ReactNode } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router'
 
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="eyebrow">{children}</p>
-}
-
 export function PageHero({
   eyebrow,
   title,
-  english,
   description,
 }: {
   eyebrow: string
   title: string
-  english: string
   description: string
 }) {
   return (
     <section className="page-hero section-pad">
       <div className="page-hero-grid container">
         <div>
-          <Eyebrow>{eyebrow}</Eyebrow>
-          <h1>{title}</h1>
-          <p className="display-english" lang="en">{english}</p>
+          <p className="eyebrow title-eyebrow">{eyebrow}</p>
+          <h1 lang="en">{title}</h1>
         </div>
         <p className="page-intro">{description}</p>
       </div>
@@ -34,20 +27,17 @@ export function PageHero({
 export function SectionHeading({
   eyebrow,
   title,
-  english,
   description,
 }: {
-  eyebrow?: string
+  eyebrow: string
   title: string
-  english?: string
   description?: string
 }) {
   return (
     <div className="section-heading">
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2>{title}</h2>
-      {english && <p className="heading-english" lang="en">{english}</p>}
-      {description && <p>{description}</p>}
+      <p className="eyebrow title-eyebrow">{eyebrow}</p>
+      <h2 lang="en">{title}</h2>
+      {description && <p className="section-heading-description">{description}</p>}
     </div>
   )
 }

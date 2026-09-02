@@ -1,32 +1,25 @@
-import {
-  ExternalLink,
-  PageHero,
-  SectionHeading,
-  SourceBadge,
-} from "../components/Shared";
+import { ExternalLink, PageHero, SectionHeading } from "../components/Shared";
 import {
   industryNetwork,
   recentResearchCounts,
   recentResearchPeriod,
   researchAreas,
-  sources,
 } from "../data/siteContent";
 
 export function ResearchPage() {
   return (
     <>
       <PageHero
-        eyebrow="RESEARCH"
-        title="研究方向"
-        english="Research Areas"
+        eyebrow="研究方向"
+        title="Research"
         description={`團隊近年的四個核心研究領域。`}
       />
 
       <section className="section-pad dark-section">
         <div className="container">
           <SectionHeading
-            eyebrow="RESEARCH AREAS"
-            title="近年核心研究領域"
+            eyebrow="近年核心研究領域"
+            title="Clusters"
             description={`主題與關鍵字依 ${recentResearchPeriod.from}—${recentResearchPeriod.to} 年論文資料整理。`}
           />
           <div className="research-detail-grid">
@@ -51,21 +44,14 @@ export function ResearchPage() {
               </article>
             ))}
           </div>
-          <div style={{ marginTop: 28 }}>
-            <SourceBadge
-              href={sources.professor.url}
-              label="Professor profile"
-            />
-          </div>
         </div>
       </section>
 
-      <section className="section-pad ">
+      <section className="section-pad research-network-section">
         <div className="container">
           <SectionHeading
-            eyebrow="RESEARCH NETWORK"
-            title="產學研究網絡"
-            english="Research Network"
+            eyebrow="產學研究網路"
+            title="Partnerships"
             description="結合大學研究、法人研發與半導體產業資源，發展兼具學術深度與工程價值的研究成果。"
           />
           <div className="research-detail-grid">
