@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PeoplePage } from './pages/PeoplePage'
 import { PublicationsPage } from './pages/PublicationsPage'
+import { ResearchPublicationsPage } from './pages/ResearchPublicationsPage'
 import { ResearchPage } from './pages/ResearchPage'
 
 export default function App() {
@@ -23,7 +24,8 @@ export default function App() {
         <Route path="members" element={<Navigate to="/about/members" replace />} />
         <Route path="people" element={<Navigate to="/about/members" replace />} />
         <Route path="awards" element={<AwardsPage />} />
-        <Route path="publications" element={<PublicationsPage />} />
+        <Route path="publications" element={<ResearchPublicationsPage />} />
+        <Route path="theses" element={<PublicationsPage />} />
         <Route path="gallery" element={<GalleryPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />

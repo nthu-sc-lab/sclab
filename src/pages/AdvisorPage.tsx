@@ -148,18 +148,7 @@ export function AdvisorPage() {
               <p className="eyebrow">CURRICULUM ARCHIVE</p>
               <strong>{String(coursesTaught.length).padStart(2, "0")}</strong>
               <span>COURSES </span>
-              <dl>
-                <div>
-                  <dt>
-                    {new Set(coursesTaught.map((course) => course.code)).size}
-                  </dt>
-                  <dd>COURSE CODES</dd>
-                </div>
-                <div>
-                  <dt>3</dt>
-                  <dd>LEARNING LEVELS</dd>
-                </div>
-              </dl>
+
               <p className="course-catalog-note"></p>
               <ExternalLink href="https://curricul.site.nthu.edu.tw/p/406-1208-290365,r7880.php?Lang=zh-tw">
                 NTHU course database

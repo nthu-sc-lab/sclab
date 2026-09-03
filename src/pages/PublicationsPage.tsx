@@ -50,7 +50,7 @@ const CLOUD_TERM_ENGLISH: Readonly<Record<string, string>> = {
   動態電壓調節: "Dynamic Voltage Scaling",
   時序分析: "Timing Analysis",
   時脈樹: "Clock Trees",
-  "封裝與3D晶片": "3D IC & Packaging",
+  封裝與3D晶片: "3D IC & Packaging",
   設計自動化: "Design Automation",
   可靠度: "Reliability",
   電路老化: "Circuit Aging",
@@ -185,14 +185,16 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
   const fontSize = useCallback(
     (term: PaperWordCloudTerm) => {
       const relativeFrequency = term.documentFrequency / maximum;
-      const baseSize = language === "en" ? 12 : 16;
-      const growth = language === "en" ? 36 : 50;
+      const baseSize = language === "en" ? 15 : 16;
+      const growth = language === "en" ? 40 : 50;
       const lengthScale =
         language === "en"
-          ? Math.max(0.56, Math.min(1, Math.sqrt(12 / term.text.length)))
+          ? Math.max(0.62, Math.min(1, Math.sqrt(14 / term.text.length)))
           : 1;
 
-      return (baseSize + Math.pow(relativeFrequency, 0.67) * growth) * lengthScale;
+      return (
+        (baseSize + Math.pow(relativeFrequency, 0.67) * growth) * lengthScale
+      );
     },
     [language, maximum],
   );
@@ -261,7 +263,7 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
           role="group"
           aria-label={
             language === "en"
-              ? "Research topics; larger terms appear in more papers"
+              ? "Thesis topics; larger terms appear in more theses"
               : "研究主題標籤；字體越大代表相關論文越多"
           }
         >
@@ -289,7 +291,7 @@ const ResearchWordCloud = memo(function ResearchWordCloud({
                   aria-pressed={isActive}
                   aria-label={
                     language === "en"
-                      ? `${text}, appears in ${term.documentFrequency} papers`
+                      ? `${text}, appears in ${term.documentFrequency} theses`
                       : `${text}，出現在 ${term.documentFrequency} 篇論文中`
                   }
                   onClick={() => onTagChange(text)}
@@ -329,7 +331,10 @@ function Pagination({
   );
 
   return (
-    <nav className="pagination" aria-label="Publications pagination">
+    <nav
+      className="pagination"
+      aria-label="Theses and dissertations pagination"
+    >
       <button
         type="button"
         disabled={page === 1}
@@ -388,9 +393,9 @@ export function PublicationsPage() {
 
   const cloudTerms = useMemo(() => {
     const terms = buildWordCloudTerms(papers, {
-        publicationYearFrom: fromYear,
-        publicationYearTo: toYear,
-      });
+      publicationYearFrom: fromYear,
+      publicationYearTo: toYear,
+    });
 
     return localizeCloudTerms(terms, cloudLanguage).slice(0, MAX_TOPIC_TAGS);
   }, [cloudLanguage, fromYear, toYear]);
@@ -455,9 +460,9 @@ export function PublicationsPage() {
   return (
     <>
       <PageHero
-        eyebrow="研究成果"
-        title="Publications"
-        description="團隊近年論文成果。"
+        eyebrow="學位論文"
+        title="Theses & Dissertations"
+        description="實驗室歷年博碩士學位論文與研究主題。"
       />
 
       <section className="section-pad">
@@ -465,11 +470,11 @@ export function PublicationsPage() {
           <div className="publication-summary">
             <div className="stat-card">
               <strong>{papers.length}</strong>
-              <span>收錄論文</span>
+              <span>收錄學位論文</span>
             </div>
             <div className="stat-card">
               <strong>{paperPublicationYears.length}</strong>
-              <span>出版年份</span>
+              <span>論文年份</span>
             </div>
             <div className="stat-card">
               <strong>{PAPER_CATEGORIES.length}</strong>
@@ -496,10 +501,7 @@ export function PublicationsPage() {
             </div>
 
             <div className="topic-toolbar">
-              <div
-                className="cloud-language-control"
-                aria-label="文字雲語言"
-              >
+              <div className="cloud-language-control" aria-label="文字雲語言">
                 <span>LANGUAGE</span>
                 <div role="group" aria-label="Word cloud language">
                   <button
@@ -556,9 +558,7 @@ export function PublicationsPage() {
                     aria-label="起始年份"
                     aria-valuetext={`${fromYear} 年`}
                     onChange={(event) => {
-                      setFromYear(
-                        Math.min(Number(event.target.value), toYear),
-                      );
+                      setFromYear(Math.min(Number(event.target.value), toYear));
                       setTag(null);
                       setPage(1);
                     }}
@@ -574,9 +574,7 @@ export function PublicationsPage() {
                     aria-label="結束年份"
                     aria-valuetext={`${toYear} 年`}
                     onChange={(event) => {
-                      setToYear(
-                        Math.max(Number(event.target.value), fromYear),
-                      );
+                      setToYear(Math.max(Number(event.target.value), fromYear));
                       setTag(null);
                       setPage(1);
                     }}
@@ -596,7 +594,7 @@ export function PublicationsPage() {
               onTagChange={handleTagChange}
             />
             <div className="topic-cloud-footer">
-              <span>{cloudScope.length} PAPERS IN RANGE</span>
+              <span>{cloudScope.length} THESES IN RANGE</span>
             </div>
           </div>
 
@@ -608,7 +606,7 @@ export function PublicationsPage() {
                 <input
                   id="paper-search"
                   value={query}
-                  placeholder="論文題目、姓名或主題"
+                  placeholder="學位論文題目、姓名或主題"
                   onChange={(event) => {
                     setQuery(event.target.value);
                     setPage(1);
@@ -628,8 +626,8 @@ export function PublicationsPage() {
 
           <div className="result-bar" aria-live="polite">
             <span>
-              顯示 {visiblePapers.length} / {papers.length} 篇論文 · 第 {page} /{" "}
-              {pageCount} 頁
+              顯示 {visiblePapers.length} / {papers.length} 篇學位論文 · 第{" "}
+              {page} / {pageCount} 頁
             </span>
             {tag && (
               <span className="selected-filter">FILTER / {activeCloudTag}</span>
@@ -638,7 +636,7 @@ export function PublicationsPage() {
 
           {visiblePapers.length === 0 ? (
             <div className="empty-state">
-              沒有符合條件的論文，請調整篩選條件。
+              沒有符合條件的學位論文，請調整篩選條件。
             </div>
           ) : (
             <>
@@ -678,7 +676,7 @@ export function PublicationsPage() {
                       href={paper.url}
                       target="_blank"
                       rel="noreferrer"
-                      aria-label={`開啟 ${paper.title} 的正式論文頁`}
+                      aria-label={`開啟 ${paper.title} 的學位論文典藏頁`}
                     >
                       <ArrowUpRight size={18} />
                     </a>

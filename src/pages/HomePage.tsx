@@ -1,11 +1,19 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router";
 import { professorPhoto, researchAreas } from "../data/siteContent";
+import { researchPublications } from "../data/researchPublications";
 import { paperPublicationYears, papers } from "../lib/papers";
 import { RouteLink } from "../components/Shared";
 
 export function HomePage() {
-  const newestPublicationYear = paperPublicationYears[0] ?? "—";
+  const newestThesisYear = paperPublicationYears[0] ?? "—";
+  const recentTheses = papers
+    .slice()
+    .sort(
+      (left, right) =>
+        right.publicationYear - left.publicationYear || right.id - left.id,
+    )
+    .slice(0, 3);
 
   return (
     <>
@@ -22,9 +30,9 @@ export function HomePage() {
                   <span>VLSI / CAD</span>
                   <em>Laboratory</em>
                 </h1>
-                <p className="hero-chinese">
+                {/* <p className="hero-chinese">
                   國立清華大學資訊工程學系 · 張世杰教授研究團隊
-                </p>
+                </p> */}
                 <div
                   className="hero-recruitment"
                   aria-label="NTHU programs for prospective students"
@@ -77,8 +85,8 @@ export function HomePage() {
                     <span>THESIS RECORDS</span>
                   </div>
                   <div>
-                    <strong>{newestPublicationYear}</strong>
-                    <span>LATEST PUBLICATION</span>
+                    <strong>{newestThesisYear}</strong>
+                    <span>LATEST THESIS</span>
                   </div>
                 </div>
               </div>
@@ -139,36 +147,30 @@ export function HomePage() {
       <section className="work-section section-pad">
         <div className="container">
           <div className="section-bar">
-            <p className="eyebrow title-eyebrow">近期研究</p>
+            <p className="eyebrow title-eyebrow">學術發表</p>
             <span>SELECTED PUBLICATIONS</span>
           </div>
           <div className="section-lead-grid">
-            <h2 lang="en"> Publications</h2>
+            <h2 lang="en">Publications</h2>
           </div>
           <div className="paper-preview-list">
-            {papers
-              .slice()
-              .sort(
-                (left, right) =>
-                  right.publicationYear - left.publicationYear ||
-                  right.id - left.id,
-              )
+            {researchPublications
               .slice(0, 3)
-              .map((paper) => (
+              .map((publication) => (
                 <a
                   className="paper-preview"
-                  href={paper.url}
+                  href={publication.url}
                   target="_blank"
                   rel="noreferrer"
-                  key={paper.id}
+                  key={publication.id}
                 >
                   <span className="paper-preview-year">
-                    {paper.publicationYear}
+                    {publication.year}
                   </span>
                   <div>
-                    <h3>{paper.title}</h3>
+                    <h3 lang="en">{publication.title}</h3>
                     <p>
-                      {paper.englishTitle || paper.student} · {paper.department}
+                      {publication.type} · {publication.venue}
                     </p>
                   </div>
                   <ArrowUpRight size={18} />
@@ -176,7 +178,44 @@ export function HomePage() {
               ))}
           </div>
           <div className="section-link">
-            <RouteLink to="/publications">Browse all publications</RouteLink>
+            <RouteLink to="/publications">View all publications</RouteLink>
+          </div>
+        </div>
+      </section>
+
+      <section className="theses-preview-section section-pad">
+        <div className="container">
+          <div className="section-bar">
+            <p className="eyebrow title-eyebrow">學位論文</p>
+            <span>THESIS ARCHIVE</span>
+          </div>
+          <div className="section-lead-grid">
+            <h2 lang="en">Theses &amp; Dissertations</h2>
+          </div>
+          <div className="paper-preview-list">
+            {recentTheses.map((paper) => (
+              <a
+                className="paper-preview"
+                href={paper.url}
+                target="_blank"
+                rel="noreferrer"
+                key={paper.id}
+              >
+                <span className="paper-preview-year">
+                  {paper.publicationYear}
+                </span>
+                <div>
+                  <h3>{paper.title}</h3>
+                  <p>
+                    {paper.englishTitle || paper.student} · {paper.department}
+                  </p>
+                </div>
+                <ArrowUpRight size={18} />
+              </a>
+            ))}
+          </div>
+          <div className="section-link">
+            <RouteLink to="/theses">Browse thesis archive</RouteLink>
           </div>
         </div>
       </section>

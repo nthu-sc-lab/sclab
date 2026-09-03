@@ -93,7 +93,7 @@ function publicationPeriod(memberPapers: readonly Paper[]) {
     ),
   ].sort((left, right) => left - right);
 
-  if (years.length === 0) return "Publication record";
+  if (years.length === 0) return "Thesis record";
   if (years.length === 1) return String(years[0]);
   return `${years[0]}–${years.at(-1)}`;
 }
@@ -455,7 +455,7 @@ export function PeoplePage() {
                               )}
                               {person.publications.length > 0 ? (
                                 <div>
-                                  <span>RESEARCH PUBLICATIONS</span>
+                                  <span>THESIS / DISSERTATION</span>
                                   <ul className="member-publication-list">
                                     {person.publications.map((paper) => (
                                       <li key={paper.id}>

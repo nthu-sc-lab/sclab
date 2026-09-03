@@ -1,7 +1,6 @@
 import { ExternalLink, PageHero, SectionHeading } from "../components/Shared";
 import {
   industryNetwork,
-  recentResearchCounts,
   recentResearchPeriod,
   researchAreas,
 } from "../data/siteContent";
@@ -11,7 +10,7 @@ export function ResearchPage() {
     <>
       <PageHero
         eyebrow="研究方向"
-        title="Research"
+        title="Research Areas"
         description={`團隊近年的四個核心研究領域。`}
       />
 
@@ -25,14 +24,14 @@ export function ResearchPage() {
           <div className="research-detail-grid">
             {researchAreas.map((area, index) => (
               <article className="research-detail" id={area.id} key={area.id}>
-                <span className="research-index">CLUSTER 0{index + 1}</span>
+                <span className="research-index">0{index + 1}</span>
                 <h3>{area.title.zh}</h3>
                 <p className="research-detail-english" lang="en">
                   {area.title.en}
                 </p>
-                <span className="research-record-count">
-                  {recentResearchCounts[area.id]} RECENT RECORDS
-                </span>
+                {/* <span className="research-record-count"> */}
+                {/* {recentResearchCounts[area.id]} RECENT RECORDS */}
+                {/* </span> */}
                 <p>{area.summary.zh}</p>
                 <ul>
                   {area.topics.map((topic) => (

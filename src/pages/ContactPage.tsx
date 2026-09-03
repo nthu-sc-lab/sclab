@@ -93,9 +93,9 @@ export function ContactPage() {
                 <div className="contact-location-icon" aria-hidden="true">
                   <MapPinned size={27} strokeWidth={1.5} />
                 </div>
-                <h3>劉炯朗館 R2342</h3>
+                <h3>劉炯朗館 R2341</h3>
                 <p className="contact-location-name" lang="en">
-                  EECS Building, R2342
+                  EECS Building, R2341
                 </p>
                 <dl className="contact-location-facts">
                   <div>

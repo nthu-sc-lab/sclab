@@ -33,8 +33,13 @@ const navigation = [
     label: "Research",
     items: [
       { to: "/research", label: "Research Areas", note: "研究方向" },
+      { to: "/publications", label: "Publications", note: "期刊與研討會論文" },
+      {
+        to: "/theses",
+        label: "Theses & Dissertations",
+        note: "學位論文",
+      },
       { to: "/awards", label: "Awards", note: "獎項榮譽" },
-      { to: "/publications", label: "Publications", note: "研究成果" },
     ],
   },
   {
@@ -267,6 +272,9 @@ export function Layout({ children }: { children: ReactNode }) {
             </NavLink>
             <NavLink to="/publications">
               <ArrowUpRight size={15} /> Publications
+            </NavLink>
+            <NavLink to="/theses">
+              <ArrowUpRight size={15} /> Theses &amp; Dissertations
             </NavLink>
           </div>
         </div>

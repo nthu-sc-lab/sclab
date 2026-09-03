@@ -2,7 +2,7 @@
 
 National Tsing Hua University SCLAB website, built with React and Vite.
 
-Research publications are loaded from [`papers.csv`](./papers.csv), the 124-record NTHU library export. The site derives recent research areas and a year-range topic index from title and subject metadata. Advisor and member profiles live under `#/about`, while the photo collection is available at `#/gallery`.
+The thesis and dissertation archive is loaded from [`papers.csv`](./papers.csv), the 124-record NTHU library export. Verified journal and conference publications are maintained separately in [`src/data/researchPublications.ts`](./src/data/researchPublications.ts). The site derives recent research areas and a year-range topic index from thesis title and subject metadata. Advisor and member profiles live under `#/about`, while the photo collection is available at `#/gallery`.
 
 ## Local development
 

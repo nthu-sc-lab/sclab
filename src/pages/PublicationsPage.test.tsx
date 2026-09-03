@@ -16,11 +16,11 @@ vi.mock('@visx/wordcloud', () => ({
 
 import { PublicationsPage } from './PublicationsPage'
 
-describe('PublicationsPage', () => {
+describe('ThesesAndDissertationsPage', () => {
   it('sorts and paginates papers and filters by a topic tag', () => {
     render(<PublicationsPage />)
 
-    expect(screen.getByText(/顯示 124 \/ 124 篇論文 · 第 1 \/ 13 頁/)).toBeInTheDocument()
+    expect(screen.getByText(/顯示 124 \/ 124 篇學位論文 · 第 1 \/ 13 頁/)).toBeInTheDocument()
     expect(screen.getAllByRole('article')).toHaveLength(10)
     expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true')
 
@@ -28,7 +28,7 @@ describe('PublicationsPage', () => {
     const initialFill = topic.getAttribute('fill')
     fireEvent.click(topic)
 
-    expect(screen.getByText(/顯示 \d+ \/ 124 篇論文 · 第 1 \/ \d+ 頁/)).toBeInTheDocument()
+    expect(screen.getByText(/顯示 \d+ \/ 124 篇學位論文 · 第 1 \/ \d+ 頁/)).toBeInTheDocument()
     expect(screen.getByText('FILTER / Deep Learning')).toBeInTheDocument()
     expect(topic).toHaveClass('active')
     expect(topic).toHaveAttribute('aria-pressed', 'true')
@@ -51,13 +51,13 @@ describe('PublicationsPage', () => {
 
     fireEvent.change(startYear, { target: { value: '2025' } })
     fireEvent.change(endYear, { target: { value: '2025' } })
-    expect(screen.getByText(/顯示 5 \/ 124 篇論文/)).toBeInTheDocument()
+    expect(screen.getByText(/顯示 5 \/ 124 篇學位論文/)).toBeInTheDocument()
 
     fireEvent.change(screen.getByLabelText('Search'), { target: { value: '不存在的題目' } })
-    expect(screen.getByText(/顯示 0 \/ 124 篇論文/)).toBeInTheDocument()
-    expect(screen.getByText('沒有符合條件的論文，請調整篩選條件。')).toBeInTheDocument()
+    expect(screen.getByText(/顯示 0 \/ 124 篇學位論文/)).toBeInTheDocument()
+    expect(screen.getByText('沒有符合條件的學位論文，請調整篩選條件。')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }))
-    expect(screen.getByText(/顯示 124 \/ 124 篇論文/)).toBeInTheDocument()
+    expect(screen.getByText(/顯示 124 \/ 124 篇學位論文/)).toBeInTheDocument()
   })
 })

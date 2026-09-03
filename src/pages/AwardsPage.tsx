@@ -53,7 +53,7 @@ export function AwardsPage() {
     <>
       <PageHero
         eyebrow="獎項與榮譽"
-        title="Awards & Honors"
+        title="Awards"
         description="研究成果獲國內外學術、工程與產業獎項肯定。"
       />
 
